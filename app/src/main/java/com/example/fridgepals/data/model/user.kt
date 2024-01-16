@@ -22,8 +22,3 @@ data class FridgeItem(
     val pickupTime: String,
     val reserved: Boolean
 )
-
-data class FoodCategory(
-    val id: String,
-    val categoryName: String
-)
