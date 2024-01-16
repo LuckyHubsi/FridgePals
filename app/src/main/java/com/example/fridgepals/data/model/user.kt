@@ -5,7 +5,6 @@ data class User(
     val email: String,
     val password: String,
     val address: Address,
-    val virtualFridgeId: String,
     val fridge: Map<String, FridgeItem>
 )
 
