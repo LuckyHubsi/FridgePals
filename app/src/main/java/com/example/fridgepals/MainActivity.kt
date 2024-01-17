@@ -16,9 +16,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.User
+import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
 
 class MainActivity : ComponentActivity() {
@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     RegistrationForm(onRegistrationComplete = { user ->
-                        FirebaseManager.registerUser(user)
+                        UserRepository.registerUser(user)
                     })
                 }
             }
@@ -57,7 +57,7 @@ fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
         TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
 
         Button(onClick = {
-            val hashedPassword = FirebaseManager.hashPassword(password)
+            val hashedPassword = UserRepository.hashPassword(password)
             val userAddress = Address(city, street)
             val user = User(name, email, hashedPassword, userAddress, fridge = emptyMap())
             onRegistrationComplete(user)
