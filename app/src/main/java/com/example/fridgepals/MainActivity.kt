@@ -25,15 +25,24 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            var loginMessage by remember { mutableStateOf("") }
+
             FridgePalsTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    RegistrationForm(onRegistrationComplete = { user ->
-                        UserRepository.registerUser(user)
-                    })
+                    LoginForm(onLoginComplete = { email, password ->
+                        UserRepository.loginUser(email, password,
+                            onSuccess = {
+                                loginMessage = "You are logged in!"
+                                // Navigate to the main screen or perform other actions
+                            },
+                            onFailure = { errorMessage ->
+                                loginMessage = "Login failed: $errorMessage"
+                            }
+                        )
+                    }, message = loginMessage)
                 }
             }
         }
@@ -66,6 +75,7 @@ fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
         }
     }
 }
+
 @Composable
 fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
     var email by remember { mutableStateOf("") }
