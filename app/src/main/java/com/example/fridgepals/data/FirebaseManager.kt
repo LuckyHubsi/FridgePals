@@ -11,21 +11,11 @@ object FirebaseManager {
 
     fun registerUser(user: User) {
         database.reference.child("users").push().setValue(user)
-
-        /*
-        // Can be implemented later
-            .addOnSuccessListener {
-                // Handle success, e.g., navigate to the next screen or show a success message
-            }
-            .addOnFailureListener { e ->
-                // Handle failure, e.g., show an error message to the user
-            }
-         */
     }
 
-    fun hashPassword(password: String): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
-        return bytes.joinToString("") {"%02x".format(it) }
-    }
+        fun hashPassword(password: String): String {
+            val bytes = MessageDigest.getInstance("SHA-256").digest(password.toByteArray())
+            return bytes.joinToString("") { "%02x".format(it) }
+        }
 }
 
