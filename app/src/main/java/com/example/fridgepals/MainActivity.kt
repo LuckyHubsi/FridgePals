@@ -66,3 +66,22 @@ fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
         }
     }
 }
+@Composable
+fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+
+    Column {
+
+        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+
+        Button(onClick = { onLoginComplete(email, password) }) {
+            Text("Login")
+        }
+        if (message.isNotEmpty()) {
+            Text(message)
+        }
+    }
+}
+
