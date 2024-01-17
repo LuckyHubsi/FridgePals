@@ -57,9 +57,9 @@ fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
         TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
 
         Button(onClick = {
-            //val hashedPassword = hashPassword(password)
+            val hashedPassword = FirebaseManager.hashPassword(password)
             val userAddress = Address(city, street)
-            val user = User(name, email, password, userAddress, fridge = emptyMap())
+            val user = User(name, email, hashedPassword, userAddress, fridge = emptyMap())
             onRegistrationComplete(user)
         }) {
             Text("Register")
