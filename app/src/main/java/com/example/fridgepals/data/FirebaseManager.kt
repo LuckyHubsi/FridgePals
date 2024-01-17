@@ -10,7 +10,7 @@ object FirebaseManager {
     }
 
     fun registerUser(user: User) {
-        FirebaseManager.database.reference.child("users").push().setValue(user)
+        database.reference.child("users").push().setValue(user)
     }
 
     fun hashPassword(password: String): String {
