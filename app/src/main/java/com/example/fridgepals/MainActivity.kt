@@ -20,29 +20,60 @@ import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.User
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
+    private lateinit var auth: FirebaseAuth
+    override fun onStart() {
+        super.onStart()
+        // Check if user is signed in (non-null) and update UI accordingly.
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            // User is signed in
+            // Redirect to main screen or perform other appropriate actions
+        } else {
+            // No user is signed in
+            // Stay on the login screen or handle accordingly
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            var loginMessage by remember { mutableStateOf("") }
+        auth = Firebase.auth
 
+        setContent {
             FridgePalsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    LoginForm(onLoginComplete = { email, password ->
-                        UserRepository.loginUser(email, password,
-                            onSuccess = {
-                                loginMessage = "You are logged in!"
-                                // Navigate to the main screen or perform other actions
-                            },
-                            onFailure = { errorMessage ->
-                                loginMessage = "Login failed: $errorMessage"
-                            }
-                        )
-                    }, message = loginMessage)
+                    var loginMessage by remember { mutableStateOf("") }
+                    var registrationMessage by remember { mutableStateOf("") }
+
+                    Column {
+                        RegistrationForm(onRegistrationComplete = { email, password, user ->
+                            UserRepository.registerUser(email, password, user,
+                                onSuccess = {
+                                    registrationMessage = "Registration successful!"
+                                },
+                                onFailure = { errorMessage ->
+                                    registrationMessage = "Registration failed: $errorMessage"
+                                }
+                            )
+                        }, registrationMessage)
+
+                        LoginForm(onLoginComplete = { email, password ->
+                            UserRepository.loginUser(email, password,
+                                onSuccess = {
+                                    loginMessage = "You are logged in!"
+                                },
+                                onFailure = { errorMessage ->
+                                    loginMessage = "Login failed: $errorMessage"
+                                }
+                            )
+                        }, loginMessage)
+                    }
                 }
             }
         }
@@ -50,7 +81,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
+fun RegistrationForm(onRegistrationComplete: (String, String, User) -> Unit, message: String) {
     // State variables for form fields (name, email, password, etc.)
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -66,12 +97,14 @@ fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
         TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
 
         Button(onClick = {
-            val hashedPassword = UserRepository.hashPassword(password)
             val userAddress = Address(city, street)
-            val user = User(name, email, hashedPassword, userAddress, fridge = emptyMap())
-            onRegistrationComplete(user)
+            val user = User(name, email, userAddress, fridge = emptyMap())
+            onRegistrationComplete(email, password, user)
         }) {
             Text("Register")
+        }
+        if (message.isNotEmpty()) {
+            Text(message)
         }
     }
 }
