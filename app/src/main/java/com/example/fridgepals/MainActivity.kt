@@ -56,42 +56,7 @@ class MainActivity : ComponentActivity() {
                     else -> {}
                 }
             }
-
-                    /*
-                    RegistrationForm(onRegistrationComplete = { user ->
-                        FirebaseManager.registerUser(user)
-                    })
-                     */
                 }
             }
         }
     }
-
-
-
-@Composable
-fun RegistrationForm(onRegistrationComplete: (User) -> Unit) {
-    // State variables for form fields (name, email, password, etc.)
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var city by remember { mutableStateOf("") }
-    var street by remember { mutableStateOf("") }
-
-    Column {
-        TextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
-        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
-        TextField(value = city, onValueChange = { city = it }, label = { Text("City") })
-        TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
-
-        Button(onClick = {
-            val hashedPassword = FirebaseManager.hashPassword(password)
-            val userAddress = Address(city, street)
-            val user = User(name, email, hashedPassword, userAddress, fridge = emptyMap())
-            onRegistrationComplete(user)
-        }) {
-            Text("Register")
-        }
-    }
-}

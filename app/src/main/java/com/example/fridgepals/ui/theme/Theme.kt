@@ -15,6 +15,12 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.example.fridgepals.ui.theme.colors.Brown
+import com.example.fridgepals.ui.theme.colors.DarkBrown
+import com.example.fridgepals.ui.theme.colors.GreenBlue
+import com.example.fridgepals.ui.theme.colors.LightBlue
+import com.example.fridgepals.ui.theme.colors.NotQuiteWhite
+import com.example.fridgepals.ui.theme.colors.YellowOrange
 
 // Not used
 private val DarkColorScheme = darkColorScheme(
@@ -26,9 +32,9 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = GreenBlue,
     secondary = YellowOrange,
-    tertiary = LightBlue,
+    tertiary = colors.LightBlue,
 
-    onPrimary = NotQuiteWhite,
+    onPrimary = colors.NotQuiteWhite,
 
     onSecondary = DarkBrown,
     onTertiary = Brown,

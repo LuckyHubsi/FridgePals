@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 
@@ -115,20 +116,24 @@ fun Login(mainViewModel: MainViewModel) {
                         .padding(bottom = 8.dp),
                     visualTransformation = PasswordVisualTransformation(),
                     colors = getOutlinedTextFieldColors()
-
                 )
 
                 Button(
                     onClick = { mainViewModel.updateAuth() },
-                    modifier = Modifier.fillMaxWidth().shadow(3.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
+                        .height(58.dp)
+                    ,
                 ) {
-                    Text("Login", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Login", color = MaterialTheme.colorScheme.onPrimary, fontSize = 22.sp)
                 }
             }
         }
         Text(
             text = "New here? Register",
             color = MaterialTheme.colorScheme.onSecondary,
+            fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 300.dp)
                 .clickable {
@@ -256,15 +261,19 @@ fun Register(mainViewModel: MainViewModel) {
                 // Register Button
                 Button(
                     onClick = { mainViewModel.updateAuth() },
-                    modifier = Modifier.fillMaxWidth().shadow(3.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary),
+                    modifier = Modifier.fillMaxWidth()
+                        .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
+                        .height(58.dp)
+                    ,
                 ) {
-                    Text("Register", color = MaterialTheme.colorScheme.onPrimary)
+                    Text("Register", color = MaterialTheme.colorScheme.onPrimary, fontSize = 22.sp)
                 }
             }
         }
         Text(
             text = "Already have an account? Login",
             color = MaterialTheme.colorScheme.onSecondary,
+            fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 550.dp)
                 .clickable {

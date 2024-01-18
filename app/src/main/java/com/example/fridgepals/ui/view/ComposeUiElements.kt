@@ -51,6 +51,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
@@ -192,51 +193,5 @@ fun BottomNavItem(selected: Boolean, onClick: () -> Unit, icon: ImageVector, mod
     }
 }
 
-@Composable
-fun OwnFridge(mainViewModel: MainViewModel){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(175.dp)
-            .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
-            .background(MaterialTheme.colorScheme.primary)
-        ,
-        horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // Child views.
-    }
-}
 
-@Composable
-fun CommunityFridge(mainViewModel: MainViewModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(175.dp)
-            .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
-            .background(MaterialTheme.colorScheme.primary)
-        ,
-        horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // Child views.
-    }
-}
-
-@Composable
-fun ReservedItems(mainViewModel: MainViewModel) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(175.dp)
-            .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
-            .background(MaterialTheme.colorScheme.primary)
-        ,
-        horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        // Child views.
-    }
-}
 
