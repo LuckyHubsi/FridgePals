@@ -3,10 +3,17 @@ package com.example.fridgepals
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -50,10 +57,12 @@ class MainActivity : ComponentActivity() {
 
                     // check if a user is currently signed in
                     if (mainViewState.isUserLoggedIn) {
-                        val currentUser = auth.currentUser // store currently signed in user in currentUser
+                        val currentUser =
+                            auth.currentUser // store currently signed in user in currentUser
                         var userName by remember { mutableStateOf("Loading...") }
 
                         if (currentUser != null) {
+
                             val userId = currentUser.uid // store firebase user uid in userId
                             val userRef = FirebaseManager.database.reference.child("users")
                                 .child(userId) // store firebase uid in userRef
@@ -71,14 +80,21 @@ class MainActivity : ComponentActivity() {
                             })
                         }
 
+                        FridgeRepository.getFoodCategories(
+                            onSuccess = { categories ->
+                                mainViewState.categories = categories
+                            },
+                            onFailure = { println("failed") }
+                        )
+
                         // User is logged in, show add item form
-                        AddItemToFridgeForm(userName, { fridgeItem ->
+                        AddItemToFridgeForm(userName, mainViewState.categories, { fridgeItem ->
                             // Call function in UserRepository to add item to fridge
                             FridgeRepository.addItemToFridge(fridgeItem,
                                 onSuccess = { println("added successfully item") },
                                 onFailure = { println("failed") }
                             )
-                        }, {UserRepository.logoutUser()} )
+                        }, { UserRepository.logoutUser() })
                     } else {
 
                         var loginMessage by remember { mutableStateOf("") }
@@ -163,11 +179,16 @@ fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
 }
 
 @Composable
-fun AddItemToFridgeForm(userName: String, onItemAdd: (FridgeItem) -> Unit, onLogout: () -> Unit) {
+fun AddItemToFridgeForm(
+    userName: String,
+    categories: List<String>,
+    onItemAdd: (FridgeItem) -> Unit,
+    onLogout: () -> Unit
+) {
     // State variables for form fields
     var itemName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
-    var categoryId by remember { mutableStateOf("") }
+    var selectedCategory by remember { mutableStateOf("") }
     var pickupDay by remember { mutableStateOf("") }
     var pickupTime by remember { mutableStateOf("") }
 
@@ -178,17 +199,28 @@ fun AddItemToFridgeForm(userName: String, onItemAdd: (FridgeItem) -> Unit, onLog
             Text("Logout")
         }
 
-        TextField(value = itemName, onValueChange = { itemName = it }, label = { Text("Item Name") })
+        TextField(
+            value = itemName,
+            onValueChange = { itemName = it },
+            label = { Text("Item Name") })
         TextField(value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity") })
-        TextField(value = categoryId, onValueChange = { categoryId = it }, label = { Text("Category ID") })
-        TextField(value = pickupDay, onValueChange = { pickupDay = it }, label = { Text("Pickup Day") })
-        TextField(value = pickupTime, onValueChange = { pickupTime = it }, label = { Text("Pickup Time") })
+        CategoryDropdownMenu(categories, selectedCategory, onCategorySelected = { category ->
+            selectedCategory = category
+        })
+        TextField(
+            value = pickupDay,
+            onValueChange = { pickupDay = it },
+            label = { Text("Pickup Day") })
+        TextField(
+            value = pickupTime,
+            onValueChange = { pickupTime = it },
+            label = { Text("Pickup Time") })
 
         Button(onClick = {
             val fridgeItem = FridgeItem(
                 name = itemName,
                 quantity = quantity,
-                categoryId = categoryId,
+                category = selectedCategory,
                 pickupDay = pickupDay,
                 pickupTime = pickupTime
             )
@@ -198,5 +230,37 @@ fun AddItemToFridgeForm(userName: String, onItemAdd: (FridgeItem) -> Unit, onLog
         }
     }
 }
+
+@Composable
+fun CategoryDropdownMenu(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(
+        text = selectedCategory,
+        modifier = Modifier.clickable { expanded = true }
+    )
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false }
+    ) {
+        categories.forEach { name ->
+            DropdownMenuItem(text = {
+                Text(text = name)
+            },
+                onClick = {
+                    onCategorySelected(name)
+                    expanded = false
+                })
+        }
+    }
+    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+}
+
+
 
 
