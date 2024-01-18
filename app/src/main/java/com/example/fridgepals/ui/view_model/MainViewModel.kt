@@ -1,5 +1,9 @@
 package com.example.fridgepals.ui.view_model
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.fridgepals.ui.view.Screen
@@ -20,4 +24,9 @@ class MainViewModel(): ViewModel() {
     fun updateAuth() {
         _mainViewState.update { it.copy(authenticator = true) }
     }
+
+    fun toggleColors(index: Int) {
+        _mainViewState.update { it.copy().also { state -> state.toggleColors(index) } }
+    }
+
 }

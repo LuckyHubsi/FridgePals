@@ -1,5 +1,6 @@
 package com.example.fridgepals.ui.view
 
+import android.annotation.SuppressLint
 import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import com.example.fridgepals.R
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 
+@SuppressLint("SuspiciousIndentation")
 @Composable
 fun OwnFridge(mainViewModel: MainViewModel) {
     val username = "Ivy"
@@ -87,7 +89,7 @@ fun OwnFridge(mainViewModel: MainViewModel) {
             RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(175.dp)
                     .padding(start = 10.dp, end = 10.dp)
             )
         }
@@ -117,7 +119,7 @@ fun OwnFridge(mainViewModel: MainViewModel) {
             RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
+                    .height(175.dp)
                     .padding(start = 10.dp, end = 10.dp)
             )
         }

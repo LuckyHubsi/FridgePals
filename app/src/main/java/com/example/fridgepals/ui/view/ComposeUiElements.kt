@@ -2,8 +2,11 @@ package com.example.fridgepals.ui.view
 
 
 import android.graphics.drawable.VectorDrawable
+import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,16 +18,33 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Build
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,9 +52,12 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter.Companion.tint
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -42,6 +65,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.ui.view_model.MainViewModel
 import com.example.fridgepals.R
+import com.example.fridgepals.ui.theme.colors
 
 sealed class Screen(val route: String){
     object First: Screen("first")
@@ -186,7 +210,7 @@ fun RoundedCard(
             imageVector = Icons.Default.Email,
             contentDescription = null,
             modifier = imageModifier
-                .size(40.dp)
+                .size(85.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.Gray)
                 .padding(8.dp)
@@ -200,7 +224,7 @@ fun RoundedCard(
         ) {
             androidx.compose.material3.Text(
                 "Item Name",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             androidx.compose.material3.Text(
                 "Description",
@@ -214,12 +238,147 @@ fun RoundedCard(
             ) {
                 // Edit button
                 TextButton(onClick = { onEditClick() }) {
-                    androidx.compose.material3.Text("Edit")
+                    androidx.compose.material3.Text("Remove")
                 }
 
                 // Remove button
                 TextButton(onClick = { onRemoveClick() }) {
-                    androidx.compose.material3.Text("Remove")
+                    androidx.compose.material3.Text("Edit")
+                }
+            }
+        }
+    }
+}
+
+
+// in the below line, we are creating a
+// model class for our data class.
+data class ListModel(
+
+    // in the below line, we are creating two variable
+    // one is for language name which is string.
+    val languageName: String,
+
+    // next variable is for our
+    // image which is an integer.
+    val languageImg: Int
+)
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun customListView() {
+    // initializing our array list
+    lateinit var courseList: List<ListModel>
+    courseList = ArrayList<ListModel>()
+
+    // in the below line, we are adding data to our list.
+    courseList = courseList + ListModel("Vegetables", R.drawable.category_vegetables)
+    courseList = courseList + ListModel("Fruits", R.drawable.category_fruits)
+    courseList = courseList + ListModel("Meat", R.drawable.category_meat)
+    courseList = courseList + ListModel("Seafood", R.drawable.category_seafood)
+    courseList = courseList + ListModel("Leftovers", R.drawable.category_leftovers)
+    courseList = courseList + ListModel("Dairy", R.drawable.category_dairy)
+    courseList = courseList + ListModel("Sweets", R.drawable.category_sweets)
+    courseList = courseList + ListModel("Grains", R.drawable.category_grains)
+    courseList = courseList + ListModel("Beverages", R.drawable.category_beverages)
+
+    val cardColors = remember { mutableStateListOf(*Array(courseList.size) { colors.NotQuiteWhite }) }
+
+    val imageTints = remember { mutableStateListOf(*Array(courseList.size) { colors.GreenBlue }) }
+
+    val textColors = remember { mutableStateListOf(*Array(courseList.size) { colors.GreenBlue }) }
+
+    // in the below line, we are creating a
+    // lazy row for displaying a horizontal list view.
+    LazyRow {
+        // in the below line, we are setting data for each item of our listview.
+        itemsIndexed(courseList) { index, item ->
+            // in the below line, we are creating a card for our list view item.
+            Card(
+                // inside our grid view on below line
+                // we are adding on click for each item of our grid view.
+                onClick = {
+                    // inside on click we are displaying the toast message.
+                    // Toggle the color of the clicked card
+                    cardColors[index] =
+                        if (cardColors[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
+
+                    // Set the image tint color to White after clicking
+                    imageTints[index] =
+                        if (imageTints[index] == colors.GreenBlue) colors.NotQuiteWhite else colors.GreenBlue
+
+                    textColors[index] =
+                        if (textColors[index] == colors.GreenBlue) colors.NotQuiteWhite else colors.GreenBlue
+                },
+                // in the below line, we are adding
+                // padding from our all sides.
+                modifier = Modifier
+                    .padding(8.dp)
+                    .width(120.dp)
+                ,
+
+                backgroundColor = cardColors[index],
+
+                // in the below line, we are adding
+                // elevation for the card.
+                elevation = 6.dp
+            )
+            {
+                // in the below line, we are creating
+                // a row for our list view item.
+                Column(
+                    // for our row we are adding modifier
+                    // to set padding from all sides.
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // in the below line, inside row we are adding spacer
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    // in the below line, we are adding Image to display the image.
+                    Icon(
+                        // in the below line, we are specifying the drawable image for our image.
+                        painter = painterResource(id = courseList[index].languageImg),
+
+                        // in the below line, we are specifying
+                        // content description for our image
+                        contentDescription = "img",
+
+                        // in the below line, we are setting height
+                        // and width for our image.
+                        modifier = Modifier
+                            .height(75.dp)
+                            .width(75.dp)
+                            .padding(1.dp)
+                        ,
+
+                        //alignment = Alignment.Center,
+
+                        tint = imageTints[index]
+                        )
+
+                    // in the below line, we are adding spacer between image and a text
+                    Spacer(modifier = Modifier.height(5.dp))
+
+                    // in the below line, we are creating a text.
+                    Text(
+                        // inside the text on below line we are
+                        // setting text as the language name
+                        // from our model class.
+                        text = courseList[index].languageName,
+
+                        // in the below line, we are adding padding
+                        // for our text from all sides.
+                        modifier = Modifier.padding(4.dp),
+
+                        // in the below line, we are adding color for our text
+                        color = textColors[index],
+
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
