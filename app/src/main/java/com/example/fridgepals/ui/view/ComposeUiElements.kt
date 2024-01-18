@@ -1,80 +1,47 @@
 package com.example.fridgepals.ui.view
 
 
-import android.util.Log
-import androidx.annotation.DrawableRes
+import android.graphics.drawable.VectorDrawable
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.BottomNavigation
 import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.ui.view_model.MainViewModel
+import com.example.fridgepals.R
 
 sealed class Screen(val route: String){
     object First: Screen("first")
@@ -136,28 +103,28 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
         BottomNavItem(
             selected = (selectedScreen == Screen.First),
             onClick = { navController.navigate(Screen.First.route) },
-            icon = Icons.Default.Home,
+            icon = R.drawable.icon_fridge,
             modifier = Modifier.width(itemWidth)
         )
 
         BottomNavItem(
             selected = (selectedScreen == Screen.Second),
             onClick = { navController.navigate(Screen.Second.route) },
-            icon = Icons.Default.Face,
+            icon = R.drawable.icon_search,
             modifier = Modifier.width(itemWidth)
         )
 
         BottomNavItem(
             selected = (selectedScreen == Screen.Third),
             onClick = { navController.navigate(Screen.Third.route) },
-            icon = Icons.Default.List,
+            icon = R.drawable.icon_basket,
             modifier = Modifier.width(itemWidth)
         )
     }
 }
 
 @Composable
-fun BottomNavItem(selected: Boolean, onClick: () -> Unit, icon: ImageVector, modifier: Modifier) {
+fun BottomNavItem(selected: Boolean, onClick: () -> Unit, icon: Int, modifier: Modifier) {
     Box(
         modifier = modifier
             .clickable(onClick = onClick)
@@ -183,15 +150,80 @@ fun BottomNavItem(selected: Boolean, onClick: () -> Unit, icon: ImageVector, mod
         contentAlignment = Alignment.Center
     ) {
         Icon(
+            painter = painterResource(icon),
             modifier = Modifier
-                .padding(8.dp)
-                .size(48.dp),
-            imageVector = icon,
+                .padding(14.dp)
+                .size(42.dp),
             contentDescription = "",
             tint = if (selected) Color.White else MaterialTheme.colorScheme.onPrimary
         )
     }
 }
 
+
+@Composable
+fun RoundedCard(
+    modifier: Modifier = Modifier,
+    imageModifier: Modifier = Modifier,
+    onEditClick: () -> Unit = {},
+    onRemoveClick: () -> Unit = {}
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(150.dp)
+            .padding(10.dp)
+            .shadow(
+                5.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = MaterialTheme.colorScheme.onSecondary
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.secondary)
+    ) {
+        // Top-left image
+        Icon(
+            imageVector = Icons.Default.Email,
+            contentDescription = null,
+            modifier = imageModifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(Color.Gray)
+                .padding(8.dp)
+        )
+
+        // Texts and buttons
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp)
+        ) {
+            androidx.compose.material3.Text(
+                "Item Name",
+                style = MaterialTheme.typography.titleMedium
+            )
+            androidx.compose.material3.Text(
+                "Description",
+                style = MaterialTheme.typography.titleSmall,
+                color = Color.Gray
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Edit button
+                TextButton(onClick = { onEditClick() }) {
+                    androidx.compose.material3.Text("Edit")
+                }
+
+                // Remove button
+                TextButton(onClick = { onRemoveClick() }) {
+                    androidx.compose.material3.Text("Remove")
+                }
+            }
+        }
+    }
+}
 
 

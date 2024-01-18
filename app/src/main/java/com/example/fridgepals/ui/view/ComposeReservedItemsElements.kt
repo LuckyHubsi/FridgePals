@@ -2,9 +2,13 @@ package com.example.fridgepals.ui.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.absolutePadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,5 +35,22 @@ fun ReservedItems(mainViewModel: MainViewModel) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text("You have reserved these items:", style = MaterialTheme.typography.titleLarge, textAlign = TextAlign.Center)
+    }
+
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 175.dp)
+    ) {
+
+
+        items(8) { index ->
+            RoundedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .padding(start = 10.dp, end = 10.dp)
+            )
+        }
+
     }
 }

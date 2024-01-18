@@ -31,19 +31,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.fridgepals.R
 import com.example.fridgepals.ui.view_model.MainViewModel
 
+
 @Composable
-fun OwnFridge(mainViewModel: MainViewModel){
+fun OwnFridge(mainViewModel: MainViewModel) {
     val username = "Ivy"
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Red)
-    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -52,137 +50,77 @@ fun OwnFridge(mainViewModel: MainViewModel){
                     10.dp,
                     shape = RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp),
                     ambientColor = MaterialTheme.colorScheme.onSecondary
-            )
-            .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
-            .background(MaterialTheme.colorScheme.primary)
-        ){
+                )
+                .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
+                .background(MaterialTheme.colorScheme.primary)
+        ) {
             Row(
                 modifier = Modifier
-                    .padding(top = 10.dp, start = 10.dp, end = 10.dp)
-                ,
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(150.dp, Alignment.CenterHorizontally),
-                //verticalAlignment = Alignment.Top,
             ) {
                 Text("Hi, $username !", style = MaterialTheme.typography.titleLarge)
-                Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onPrimary)
+                Icon(
+                    painter = painterResource(R.drawable.icon_menu),
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(64.dp))
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 85.dp, start = 15.dp, end = 15.dp)
-                ,
+                    .padding(top = 85.dp, start = 15.dp, end = 15.dp),
                 verticalAlignment = Alignment.Top,
             ) {
                 Text("Your fridge wants to get rid of:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
             }
         }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp)
-                .background(Color.Black)
-        ) {
-            items(2) { index ->
-                RoundedCard(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(start = 10.dp, end = 10.dp)
-                )
-            }
+
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 175.dp)
+    ) {
+
+
+        items(2) { index ->
+            RoundedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .padding(start = 10.dp, end = 10.dp)
+            )
         }
 
-        Box(
-            modifier = Modifier
-                .padding(top = 20.dp)
-        ){
-            Row(
+        item {
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(75.dp)
-                    .background(MaterialTheme.colorScheme.tertiary)
-                    .absolutePadding(top = 150.dp)
-                ,
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                    .background(MaterialTheme.colorScheme.tertiary),
             ) {
-                Text("People have reserved:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp)
-                .background(Color.Black)
-        ) {
-            items(2) { index ->
-                RoundedCard(
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
-                        .padding(start = 10.dp, end = 10.dp)
-                )
+                        .height(75.dp)
+                        .background(MaterialTheme.colorScheme.tertiary)
+                    ,
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("People have reserved:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+                }
             }
         }
-    }
-}
 
-@Composable
-fun RoundedCard(
-    modifier: Modifier = Modifier,
-    imageModifier: Modifier = Modifier,
-    onEditClick: () -> Unit = {},
-    onRemoveClick: () -> Unit = {}
-) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(150.dp)
-            .padding(10.dp)
-            .shadow(
-                5.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = MaterialTheme.colorScheme.onSecondary
+        items(4) { index ->
+            RoundedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
+                    .padding(start = 10.dp, end = 10.dp)
             )
-            .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.secondary)
-    ) {
-        // Top-left image
-        Icon(
-            imageVector = Icons.Default.Email,
-            contentDescription = null,
-            modifier = imageModifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.Gray)
-                .padding(8.dp)
-        )
-
-        // Texts and buttons
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp)
-        ) {
-            Text("Item Name", style = MaterialTheme.typography.titleMedium)
-            Text("Description", style = MaterialTheme.typography.titleSmall, color = Color.Gray)
-            Spacer(modifier = Modifier.weight(1f))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // Edit button
-                TextButton(onClick = { onEditClick() }) {
-                    Text("Edit")
-                }
-
-                // Remove button
-                TextButton(onClick = { onRemoveClick() }) {
-                    Text("Remove")
-                }
-            }
         }
     }
 }
+
