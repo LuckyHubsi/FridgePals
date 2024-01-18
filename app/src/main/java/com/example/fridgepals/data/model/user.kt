@@ -13,10 +13,10 @@ data class Address(
 )
 
 data class FridgeItem(
-    val name: String,
-    val quantity: String,
-    val categoryId: String,
-    val pickupDay: String,
-    val pickupTime: String,
-    val reserved: Boolean
+    val name: String = "",
+    val quantity: String = "",
+    val categoryId: String = "",
+    val pickupDay: String = "",
+    val pickupTime: String = "",
+    val reserved: Boolean = false
 )

@@ -16,28 +16,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
+import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.User
+import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
+import com.example.fridgepals.ui.view_model.MainViewState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
-    override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            // User is signed in
-            // Redirect to main screen or perform other appropriate actions
-        } else {
-            // No user is signed in
-            // Stay on the login screen or handle accordingly
-        }
-    }
+    private val mainViewState by mutableStateOf(MainViewState())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
@@ -48,31 +45,68 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var loginMessage by remember { mutableStateOf("") }
-                    var registrationMessage by remember { mutableStateOf("") }
+                    // Check if user is logged in and update state
+                    mainViewState.isUserLoggedIn = auth.currentUser != null
 
-                    Column {
-                        RegistrationForm(onRegistrationComplete = { email, password, user ->
-                            UserRepository.registerUser(email, password, user,
-                                onSuccess = {
-                                    registrationMessage = "Registration successful!"
-                                },
-                                onFailure = { errorMessage ->
-                                    registrationMessage = "Registration failed: $errorMessage"
-                                }
-                            )
-                        }, registrationMessage)
+                    // check if a user is currently signed in
+                    if (mainViewState.isUserLoggedIn) {
+                        val currentUser = auth.currentUser // store currently signed in user in currentUser
+                        var userName by remember { mutableStateOf("Loading...") }
 
-                        LoginForm(onLoginComplete = { email, password ->
-                            UserRepository.loginUser(email, password,
-                                onSuccess = {
-                                    loginMessage = "You are logged in!"
-                                },
-                                onFailure = { errorMessage ->
-                                    loginMessage = "Login failed: $errorMessage"
+                        if (currentUser != null) {
+                            val userId = currentUser.uid // store firebase user uid in userId
+                            val userRef = FirebaseManager.database.reference.child("users")
+                                .child(userId) // store firebase uid in userRef
+
+                            // get user's name from the realtime database and store it in userName
+                            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    val user = snapshot.getValue(User::class.java)
+                                    userName = user?.name ?: "Unknown"
                                 }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                    userName = "Error fetching name"
+                                }
+                            })
+                        }
+
+                        // User is logged in, show add item form
+                        AddItemToFridgeForm(userName, { fridgeItem ->
+                            // Call function in UserRepository to add item to fridge
+                            FridgeRepository.addItemToFridge(fridgeItem,
+                                onSuccess = { println("added successfully item") },
+                                onFailure = { println("failed") }
                             )
-                        }, loginMessage)
+                        }, {UserRepository.logoutUser()} )
+                    } else {
+
+                        var loginMessage by remember { mutableStateOf("") }
+                        var registrationMessage by remember { mutableStateOf("") }
+
+                        Column {
+                            RegistrationForm(onRegistrationComplete = { email, password, user ->
+                                UserRepository.registerUser(email, password, user,
+                                    onSuccess = {
+                                        registrationMessage = "Registration successful!"
+                                    },
+                                    onFailure = { errorMessage ->
+                                        registrationMessage = "Registration failed: $errorMessage"
+                                    }
+                                )
+                            }, registrationMessage)
+
+                            LoginForm(onLoginComplete = { email, password ->
+                                UserRepository.loginUser(email, password,
+                                    onSuccess = {
+                                        loginMessage = "You are logged in!"
+                                    },
+                                    onFailure = { errorMessage ->
+                                        loginMessage = "Login failed: $errorMessage"
+                                    }
+                                )
+                            }, loginMessage)
+                        }
                     }
                 }
             }
@@ -127,4 +161,42 @@ fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
         }
     }
 }
+
+@Composable
+fun AddItemToFridgeForm(userName: String, onItemAdd: (FridgeItem) -> Unit, onLogout: () -> Unit) {
+    // State variables for form fields
+    var itemName by remember { mutableStateOf("") }
+    var quantity by remember { mutableStateOf("") }
+    var categoryId by remember { mutableStateOf("") }
+    var pickupDay by remember { mutableStateOf("") }
+    var pickupTime by remember { mutableStateOf("") }
+
+    Column {
+        Text(text = "Logged in as: $userName")
+
+        Button(onClick = { onLogout() }) {
+            Text("Logout")
+        }
+
+        TextField(value = itemName, onValueChange = { itemName = it }, label = { Text("Item Name") })
+        TextField(value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity") })
+        TextField(value = categoryId, onValueChange = { categoryId = it }, label = { Text("Category ID") })
+        TextField(value = pickupDay, onValueChange = { pickupDay = it }, label = { Text("Pickup Day") })
+        TextField(value = pickupTime, onValueChange = { pickupTime = it }, label = { Text("Pickup Time") })
+
+        Button(onClick = {
+            val fridgeItem = FridgeItem(
+                name = itemName,
+                quantity = quantity,
+                categoryId = categoryId,
+                pickupDay = pickupDay,
+                pickupTime = pickupTime
+            )
+            onItemAdd(fridgeItem)
+        }) {
+            Text("Add to Fridge")
+        }
+    }
+}
+
 
