@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,22 +22,32 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material.icons.outlined.ExitToApp
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -358,7 +369,7 @@ fun PopUp(mainViewModel: MainViewModel) {
                             shape = RectangleShape
                         ) {
                             androidx.compose.material.Text(
-                                "Confirm",
+                                text = "Confirm",
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 fontSize = 20.sp
                             )
@@ -456,4 +467,90 @@ fun CustomListView(mainViewModel: MainViewModel) {
     }
 }
 
+@Composable
+fun ProfileDropdownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            //.fillMaxSize()
+            .height(75.dp)
+            .width(350.dp)
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        IconButton(onClick = { expanded = true }, modifier = Modifier.fillMaxSize()) {
+            Icon(
+                painter = painterResource(R.drawable.icon_menu),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.size(350.dp)
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Edit Profile") },
+                onClick = { /* Handle edit! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = null
+                    )
+                })
+            DropdownMenuItem(
+                text = { Text("Logout") },
+                onClick = { /* Handle settings! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.ExitToApp,
+                        contentDescription = null
+                    )
+                })
+        }
+    }
+}
+
+@Composable
+fun LocationDropdownMenu() {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            //.fillMaxSize()
+            .height(75.dp)
+            .width(350.dp)
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        TextButton(onClick = { expanded = true }) {
+            Text("St. Pölten")
+        }
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary)
+        ) {
+            DropdownMenuItem(
+                text = { Text("Edit Profile") },
+                onClick = { /* Handle edit! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.Edit,
+                        contentDescription = null
+                    )
+                })
+            DropdownMenuItem(
+                text = { Text("Logout") },
+                onClick = { /* Handle settings! */ },
+                leadingIcon = {
+                    Icon(
+                        Icons.Outlined.ExitToApp,
+                        contentDescription = null
+                    )
+                })
+        }
+    }
 

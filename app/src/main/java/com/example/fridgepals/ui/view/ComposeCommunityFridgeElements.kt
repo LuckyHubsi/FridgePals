@@ -37,6 +37,9 @@ fun CommunityFridge(mainViewModel: MainViewModel) {
         horizontalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+
+        LocationDropdownMenu()
+
     }
 
     Box(

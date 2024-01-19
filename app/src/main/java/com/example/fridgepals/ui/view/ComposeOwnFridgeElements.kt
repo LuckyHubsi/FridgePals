@@ -69,14 +69,10 @@ fun OwnFridge(mainViewModel: MainViewModel) {
             Row(
                 modifier = Modifier
                     .padding(top = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(150.dp, Alignment.CenterHorizontally),
+                horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally),
             ) {
                 Text("Hi, $username !", style = MaterialTheme.typography.titleLarge)
-                Icon(
-                    painter = painterResource(R.drawable.icon_menu),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(64.dp))
+                ProfileDropdownMenu()
             }
             Row(
                 modifier = Modifier
