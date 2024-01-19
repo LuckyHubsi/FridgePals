@@ -267,7 +267,7 @@ data class ListModel(
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun customListView() {
+fun CustomListView(mainViewModel: MainViewModel) {
     // initializing our array list
     lateinit var courseList: List<ListModel>
     courseList = ArrayList<ListModel>()
@@ -283,11 +283,16 @@ fun customListView() {
     courseList = courseList + ListModel("Grains", R.drawable.category_grains)
     courseList = courseList + ListModel("Beverages", R.drawable.category_beverages)
 
+
     val cardColors = remember { mutableStateListOf(*Array(courseList.size) { colors.NotQuiteWhite }) }
 
     val imageTints = remember { mutableStateListOf(*Array(courseList.size) { colors.GreenBlue }) }
 
     val textColors = remember { mutableStateListOf(*Array(courseList.size) { colors.GreenBlue }) }
+
+
+
+    val state = mainViewModel.mainViewState.collectAsState()
 
     // in the below line, we are creating a
     // lazy row for displaying a horizontal list view.
@@ -301,6 +306,9 @@ fun customListView() {
                 onClick = {
                     // inside on click we are displaying the toast message.
                     // Toggle the color of the clicked card
+
+                          mainViewModel.toggleColors(index)
+/*
                     cardColors[index] =
                         if (cardColors[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
 
@@ -310,6 +318,9 @@ fun customListView() {
 
                     textColors[index] =
                         if (textColors[index] == colors.GreenBlue) colors.NotQuiteWhite else colors.GreenBlue
+
+
+ */
                 },
                 // in the below line, we are adding
                 // padding from our all sides.
@@ -318,7 +329,8 @@ fun customListView() {
                     .width(120.dp)
                 ,
 
-                backgroundColor = cardColors[index],
+                backgroundColor = state.value.cardColors[index],
+                //backgroundColor = cardColors[index],
 
                 // in the below line, we are adding
                 // elevation for the card.
@@ -357,8 +369,10 @@ fun customListView() {
 
                         //alignment = Alignment.Center,
 
-                        tint = imageTints[index]
-                        )
+                        tint = state.value.imageTints[index]
+                        //tint = imageTints[index]
+
+                    )
 
                     // in the below line, we are adding spacer between image and a text
                     Spacer(modifier = Modifier.height(5.dp))
@@ -375,7 +389,9 @@ fun customListView() {
                         modifier = Modifier.padding(4.dp),
 
                         // in the below line, we are adding color for our text
-                        color = textColors[index],
+
+                        color = state.value.textColor[index],
+                        //color = textColors[index],
 
                         textAlign = TextAlign.Center
                     )

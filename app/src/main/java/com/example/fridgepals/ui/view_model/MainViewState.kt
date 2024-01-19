@@ -6,16 +6,19 @@ import com.example.fridgepals.ui.view.Screen
 
 data class MainViewState (
     val selectedScreen: Screen = Screen.Login,
-    var authenticator: Boolean = true,
+    var authenticator: Boolean = false,
     var cardColors: List<Color> = List(9) { colors.NotQuiteWhite },
     var imageTints: List<Color> = List(9) { colors.GreenBlue },
     var textColor: List<Color> = List(9) { colors.GreenBlue }
 ){
     // Function to update card colors, image tints, and text colors
     fun toggleColors(index: Int) {
-        val newColor = if (cardColors[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
-        cardColors = cardColors.toMutableList().also { it[index] = newColor }
-        imageTints = imageTints.toMutableList().also { it[index] = colors.NotQuiteWhite }
-        textColor = textColor.toMutableList().also { it[index] = colors.NotQuiteWhite }
+        val newColorCard = if (cardColors[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
+        val newColorImage = if (imageTints[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
+        val newColorText = if (textColor[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
+
+        cardColors = cardColors.toMutableList().also { it[index] = newColorCard }
+        imageTints = imageTints.toMutableList().also { it[index] = newColorImage }
+        textColor = textColor.toMutableList().also { it[index] = newColorText }
     }
 }

@@ -40,7 +40,7 @@ fun CommunityFridge(mainViewModel: MainViewModel) {
             .fillMaxWidth()
             .padding(top = 100.dp)
     ){
-        customListView()
+        CustomListView(mainViewModel)
     }
 
     LazyColumn(
