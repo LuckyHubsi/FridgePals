@@ -110,6 +110,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             FridgeRepository.getCommunityFridge(
+                                currentUserId = userId,
                                 onSuccess = { items ->
                                     allFridgeItems = items
                                 },
