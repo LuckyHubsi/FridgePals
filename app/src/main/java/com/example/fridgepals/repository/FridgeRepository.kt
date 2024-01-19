@@ -37,11 +37,30 @@ object FridgeRepository {
         })
     }
 
-    fun getFridgeItems(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+    fun getFridgeItemsNotReserved(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
         val fridgeRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge")
         fridgeRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val items = snapshot.children.mapNotNull { it.getValue(FridgeItem::class.java) }
+                val items = snapshot.children.mapNotNull { dataSnapshot ->
+                    val item = dataSnapshot.getValue(FridgeItem::class.java)
+                    // Only add the item if 'reserved' is true
+                    if (item != null && !item.reserved) item else null }
+                onSuccess(items)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                onFailure(databaseError.message)
+            }
+        })
+    }
+
+    fun getFridgeItemsReserved(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+        val fridgeRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge")
+        fridgeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val items = snapshot.children.mapNotNull { dataSnapshot ->
+                    val item = dataSnapshot.getValue(FridgeItem::class.java)
+                    // Only add the item if 'reserved' is true
+                    if (item != null && item.reserved) item else null }
                 onSuccess(items)
             }
             override fun onCancelled(databaseError: DatabaseError) {
@@ -64,7 +83,7 @@ object FridgeRepository {
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to delete item") }
     }
 
-    fun getAllFridgeItems(onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+    fun getCommunityFridge(onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
         val usersRef = FirebaseManager.database.reference.child("users")
         val allFridgeItems = mutableListOf<FridgeItem>()
 
@@ -73,7 +92,10 @@ object FridgeRepository {
                 snapshot.children.forEach { userSnapshot ->
                     userSnapshot.child("fridge").children.forEach { itemSnapshot ->
                         val item = itemSnapshot.getValue(FridgeItem::class.java)
-                        item?.let { allFridgeItems.add(it) }
+                        // Check if the item is not reserved before adding it
+                        if (item != null && !item.reserved) {
+                            allFridgeItems.add(item)
+                        }
                     }
                 }
                 onSuccess(allFridgeItems)

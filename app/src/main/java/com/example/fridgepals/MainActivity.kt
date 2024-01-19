@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
                             })
 
 
-                            FridgeRepository.getFridgeItems(userId,
+                            FridgeRepository.getFridgeItemsNotReserved(userId,
                                 onSuccess = { items ->
                                     fridgeItems = items
                                 },
@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
                                 onFailure = { println("failed") }
                             )
 
-                            FridgeRepository.getAllFridgeItems(
+                            FridgeRepository.getCommunityFridge(
                                 onSuccess = { items ->
                                     allFridgeItems = items
                                 },
@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
                                         userId,
                                         item.itemId,
                                         onSuccess = {
-                                            FridgeRepository.getFridgeItems(
+                                            FridgeRepository.getFridgeItemsNotReserved(
                                                 userId,
                                                 onSuccess = { items -> fridgeItems = items },
                                                 onFailure = { println("failed") })
@@ -164,7 +164,7 @@ class MainActivity : ComponentActivity() {
                                         currentItemToEdit!!.itemId,
                                         updatedItem,
                                         onSuccess = {
-                                            FridgeRepository.getFridgeItems(
+                                            FridgeRepository.getFridgeItemsNotReserved(
                                                 userId,
                                                 onSuccess = { items ->
                                                     fridgeItems = items
