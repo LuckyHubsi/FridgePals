@@ -12,6 +12,7 @@ object FridgeRepository {
     fun addItemToFridge(userId: String, fridgeItem: FridgeItem, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         // Reference to the user's fridge in the database
         val itemRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge").push()
+        fridgeItem.itemId = itemRef.key ?: return onFailure("Failed to generate item ID")
 
         // Set the value of the new item in the user's fridge
         itemRef.setValue(fridgeItem)
@@ -47,6 +48,20 @@ object FridgeRepository {
                 onFailure(databaseError.message)
             }
         })
+    }
+
+    fun editFridgeItem(userId: String, itemId: String, updateItem: FridgeItem, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val itemRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge").child(itemId)
+        itemRef.setValue(updateItem)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e.message ?: "Failed to update item") }
+    }
+
+    fun deleteFridgeItem(userId: String, itemId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        val itemRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge").child(itemId)
+        itemRef.removeValue()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e.message ?: "Failed to delete item") }
     }
 
 }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
@@ -49,6 +50,7 @@ import com.google.firebase.database.ValueEventListener
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
     private val mainViewState by mutableStateOf(MainViewState())
+    private var currentItemToEdit by mutableStateOf<FridgeItem?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -88,39 +90,80 @@ class MainActivity : ComponentActivity() {
                                     userName = "Error fetching name"
                                 }
                             })
-                        }
 
-                        FridgeRepository.getFridgeItems(userId,
-                            onSuccess = { items ->
-                                fridgeItems = items
-                            },
-                            onFailure = { /* Handle failure */ }
-                        )
 
-                        FridgeRepository.getFoodCategories(
-                            onSuccess = { categories ->
-                                mainViewState.categories = categories
-                            },
-                            onFailure = { println("failed") }
-                        )
+                            FridgeRepository.getFridgeItems(userId,
+                                onSuccess = { items ->
+                                    fridgeItems = items
+                                },
+                                onFailure = { /* Handle failure */ }
+                            )
 
-                        // User is logged in, show add item form
-                        AddItemToFridgeForm(userName, mainViewState.categories, { fridgeItem ->
-                            // Call function in UserRepository to add item to fridge
-                            FridgeRepository.addItemToFridge(userId, fridgeItem,
-                                onSuccess = { println("added successfully item") },
+                            FridgeRepository.getFoodCategories(
+                                onSuccess = { categories ->
+                                    mainViewState.categories = categories
+                                },
                                 onFailure = { println("failed") }
                             )
-                        }, {
-                            UserRepository.logoutUser()
-                            mainViewState.isUserLoggedIn = false
-                        })
-                        Box(
-                            modifier = Modifier.padding(top=400.dp)
-                        ) {
-                            FridgeItemList(fridgeItems)
-                        }
 
+                            // User is logged in, show add item form
+                            AddItemToFridgeForm(userName, mainViewState.categories, { fridgeItem ->
+                                // Call function in UserRepository to add item to fridge
+                                FridgeRepository.addItemToFridge(userId, fridgeItem,
+                                    onSuccess = { println("added successfully item") },
+                                    onFailure = { println("failed") }
+                                )
+                            }, {
+                                UserRepository.logoutUser()
+                                mainViewState.isUserLoggedIn = false
+                            })
+                            Box(
+                                modifier = Modifier.padding(top = 400.dp)
+                            ) {
+                                FridgeItemList(fridgeItems, onEditItem = { item ->
+                                    currentItemToEdit = item // Set the item to be edited
+                                }, onDeleteItem = { item ->
+                                    FridgeRepository.deleteFridgeItem(
+                                        userId,
+                                        item.itemId,
+                                        onSuccess = {
+                                            FridgeRepository.getFridgeItems(
+                                                userId,
+                                                onSuccess = { items -> fridgeItems = items },
+                                                onFailure = { println("failed") })
+                                        },
+                                        onFailure = { error ->
+                                            // handle error
+                                        })
+                                })
+                            }
+                        }
+                        if (currentItemToEdit != null) {
+                            EditFridgeItemDialog(
+                                categories = mainViewState.categories,
+                                item = currentItemToEdit!!,
+                                onDismiss = { currentItemToEdit = null },
+                                onConfirm = { updatedItem ->
+                                    FridgeRepository.editFridgeItem(userId,
+                                        currentItemToEdit!!.itemId,
+                                        updatedItem,
+                                        onSuccess = {
+                                            FridgeRepository.getFridgeItems(
+                                                userId,
+                                                onSuccess = { items ->
+                                                    fridgeItems = items
+                                                },
+                                                onFailure = { println("failed") })
+                                            currentItemToEdit = null
+                                        },
+                                        onFailure = { error ->
+                                            // Handle error
+                                            currentItemToEdit = null
+                                        }
+                                    )
+                                }
+                            )
+                        }
 
                     } else {
 
@@ -134,7 +177,8 @@ class MainActivity : ComponentActivity() {
                                         registrationMessage = "Registration successful!"
                                     },
                                     onFailure = { errorMessage ->
-                                        registrationMessage = "Registration failed: $errorMessage"
+                                        registrationMessage =
+                                            "Registration failed: $errorMessage"
                                     }
                                 )
                             }, registrationMessage)
@@ -169,7 +213,10 @@ fun RegistrationForm(onRegistrationComplete: (String, String, User) -> Unit, mes
     Column {
         TextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") })
         TextField(value = city, onValueChange = { city = it }, label = { Text("City") })
         TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
 
@@ -194,7 +241,10 @@ fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
     Column {
 
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+        TextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Password") })
 
         Button(onClick = { onLoginComplete(email, password) }) {
             Text("Login")
@@ -230,7 +280,10 @@ fun AddItemToFridgeForm(
             value = itemName,
             onValueChange = { itemName = it },
             label = { Text("Item Name") })
-        TextField(value = quantity, onValueChange = { quantity = it }, label = { Text("Quantity") })
+        TextField(
+            value = quantity,
+            onValueChange = { quantity = it },
+            label = { Text("Quantity") })
         CategoryDropdownMenu(categories, selectedCategory, onCategorySelected = { category ->
             selectedCategory = category
         })
@@ -289,20 +342,24 @@ fun CategoryDropdownMenu(
 }
 
 @Composable
-fun FridgeItemList(fridgeItems: List<FridgeItem>) {
+fun FridgeItemList(
+    fridgeItems: List<FridgeItem>,
+    onEditItem: (FridgeItem) -> Unit,
+    onDeleteItem: (FridgeItem) -> Unit
+) {
     if (fridgeItems.isEmpty()) {
         Text("Your fridge is empty")
     } else {
         LazyColumn {
             items(fridgeItems) { item ->
-                FridgeItemRow(item)
+                FridgeItemRow(item, onEdit = onEditItem, onDelete = onDeleteItem)
             }
         }
     }
 }
 
 @Composable
-fun FridgeItemRow(item: FridgeItem) {
+fun FridgeItemRow(item: FridgeItem, onEdit: (FridgeItem) -> Unit, onDelete: (FridgeItem) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -317,11 +374,78 @@ fun FridgeItemRow(item: FridgeItem) {
             Text(text = "Pickup Day: ${item.pickupDay}")
             Text(text = "Pickup Time: ${item.pickupTime}")
         }
+        Button(onClick = { onEdit(item) }) {
+            Text("Edit")
+        }
+        Button(onClick = { onDelete(item) }) {
+            Text("Delete")
+        }
     }
 }
 
+@Composable
+fun EditFridgeItemDialog(
+    categories: List<String>,
+    item: FridgeItem,
+    onDismiss: () -> Unit,
+    onConfirm: (FridgeItem) -> Unit
+) {
+    var itemName by remember { mutableStateOf(item.name) }
+    var quantity by remember { mutableStateOf(item.quantity) }
+    var selectedCategory by remember { mutableStateOf(item.category) }
+    var pickupDay by remember { mutableStateOf(item.pickupDay) }
+    var pickupTime by remember { mutableStateOf(item.pickupTime) }
 
 
-
-
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Edit Fridge Item") },
+        text = {
+            Column {
+                TextField(
+                    value = itemName,
+                    onValueChange = { itemName = it },
+                    label = { Text("Item Name") }
+                )
+                TextField(value = quantity,
+                    onValueChange = { quantity = it },
+                    label = { Text("Quantity") }
+                )
+                CategoryDropdownMenu(
+                    categories,
+                    selectedCategory,
+                    onCategorySelected = { category ->
+                        selectedCategory = category
+                    })
+                TextField(
+                    value = pickupDay,
+                    onValueChange = { pickupDay = it },
+                    label = { Text("Pickup Day") })
+                TextField(
+                    value = pickupTime,
+                    onValueChange = { pickupTime = it },
+                    label = { Text("Pickup Time") })
+            }
+        },
+        confirmButton = {
+            Button(onClick = {
+                val updatedItem = item.copy(
+                    name = itemName,
+                    quantity = quantity,
+                    category = selectedCategory,
+                    pickupDay = pickupDay,
+                    pickupTime = pickupTime
+                )
+                onConfirm(updatedItem)
+            }) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
 

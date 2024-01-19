@@ -13,6 +13,7 @@ data class Address(
 )
 
 data class FridgeItem(
+    var itemId: String = "",
     val name: String = "",
     val quantity: String = "",
     val category: String = "",
