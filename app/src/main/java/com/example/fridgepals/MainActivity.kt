@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
                             auth.currentUser // store currently signed in user in currentUser
                         var userName by remember { mutableStateOf("Loading...") }
                         var fridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+                        var allFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
 
                         if (currentUser != null) {
 
@@ -107,6 +109,14 @@ class MainActivity : ComponentActivity() {
                                 onFailure = { println("failed") }
                             )
 
+                            FridgeRepository.getAllFridgeItems(
+                                onSuccess = { items ->
+                                    allFridgeItems = items
+                                },
+                                onFailure = { /* Handle failure */ }
+                            )
+
+
                             // User is logged in, show add item form
                             AddItemToFridgeForm(userName, mainViewState.categories, { fridgeItem ->
                                 // Call function in UserRepository to add item to fridge
@@ -137,6 +147,11 @@ class MainActivity : ComponentActivity() {
                                             // handle error
                                         })
                                 })
+                                Box(modifier = Modifier.size(300.dp)) {
+                                    AllUsersFridgeItemsList(
+                                        allFridgeItems
+                                    )
+                                }
                             }
                         }
                         if (currentItemToEdit != null) {
@@ -164,6 +179,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             )
+
                         }
 
                     } else {
@@ -458,5 +474,38 @@ fun EditFridgeItemDialog(
             }
         }
     )
+}
+
+@Composable
+fun AllUsersFridgeItemsList(fridgeItems: List<FridgeItem>) {
+    if (fridgeItems.isEmpty()) {
+        Text("No items available in the community fridge")
+    } else {
+        Text(text = "This is the community fridge")
+        LazyColumn{
+            items(fridgeItems) { item ->
+                AllFridgeItemsRow(item)
+            }
+        }
+    }
+}
+
+@Composable
+fun AllFridgeItemsRow(item: FridgeItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "Item: ${item.name}")
+            Text(text = "Quantity: ${item.quantity}")
+            Text(text = "Category: ${item.category}")
+            Text(text = "Pickup Day: ${item.pickupDay}")
+            Text(text = "Pickup Time: ${item.pickupTime}")
+        }
+    }
 }
 

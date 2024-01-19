@@ -64,4 +64,25 @@ object FridgeRepository {
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to delete item") }
     }
 
+    fun getAllFridgeItems(onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+        val usersRef = FirebaseManager.database.reference.child("users")
+        val allFridgeItems = mutableListOf<FridgeItem>()
+
+        usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach { userSnapshot ->
+                    userSnapshot.child("fridge").children.forEach { itemSnapshot ->
+                        val item = itemSnapshot.getValue(FridgeItem::class.java)
+                        item?.let { allFridgeItems.add(it) }
+                    }
+                }
+                onSuccess(allFridgeItems)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                onFailure(databaseError.message)
+            }
+        })
+    }
+
 }
