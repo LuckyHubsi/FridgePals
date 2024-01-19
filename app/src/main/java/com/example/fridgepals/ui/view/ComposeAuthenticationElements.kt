@@ -284,7 +284,7 @@ fun Register(mainViewModel: MainViewModel) {
 }
 
 @Composable
-private fun getOutlinedTextFieldColors(): TextFieldColors {
+fun getOutlinedTextFieldColors(): TextFieldColors {
     return TextFieldDefaults.outlinedTextFieldColors(
         focusedBorderColor = MaterialTheme.colorScheme.tertiary,
         unfocusedBorderColor = MaterialTheme.colorScheme.primary,

@@ -27,7 +27,11 @@ fun ReservedItems(mainViewModel: MainViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .height(175.dp)
-            .shadow(10.dp, shape = RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp), ambientColor = MaterialTheme.colorScheme.onSecondary)
+            .shadow(
+                10.dp,
+                shape = RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp),
+                ambientColor = MaterialTheme.colorScheme.onSecondary
+            )
             .clip(RoundedCornerShape(bottomStart = 54.dp, bottomEnd = 54.dp))
             .background(MaterialTheme.colorScheme.primary)
         ,
@@ -39,7 +43,7 @@ fun ReservedItems(mainViewModel: MainViewModel) {
 
     LazyColumn(
         modifier = Modifier
-            .padding(top = 175.dp)
+            .padding(top = 180.dp)
     ) {
 
 
@@ -47,8 +51,8 @@ fun ReservedItems(mainViewModel: MainViewModel) {
             RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(150.dp)
-                    .padding(start = 10.dp, end = 10.dp)
+                    .padding(start = 10.dp, end = 10.dp),
+                buttonContent = { ButtonContentReservedItems() }
             )
         }
 

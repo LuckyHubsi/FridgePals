@@ -21,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.materialIcon
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,13 +39,21 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.fridgepals.R
 import com.example.fridgepals.ui.view_model.MainViewModel
-
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material3.Button
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.unit.sp
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun OwnFridge(mainViewModel: MainViewModel) {
     val username = "Ivy"
 
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ){
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,55 +84,85 @@ fun OwnFridge(mainViewModel: MainViewModel) {
                     .padding(top = 85.dp, start = 15.dp, end = 15.dp),
                 verticalAlignment = Alignment.Top,
             ) {
-                Text("Your fridge wants to get rid of:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+                Text("Your fridge wants to get rid of:",
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.Center,
+                )
             }
         }
 
-
-    LazyColumn(
-        modifier = Modifier
-            .padding(top = 175.dp)
-    ) {
-
-
-        items(2) { index ->
-            RoundedCard(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 190.dp)
+            ,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ){
+            Button(
+                onClick = { mainViewModel.openDialog() },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(175.dp)
-                    .padding(start = 10.dp, end = 10.dp)
-            )
+                    .width(225.dp)
+                    .height(70.dp)
+                    .shadow(
+                        5.dp,
+                        shape = RoundedCornerShape(20.dp),
+                        ambientColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                    .clip(RoundedCornerShape(20.dp)),
+                shape = RectangleShape
+            ) {
+                Text("Add Item", fontFamily = MaterialTheme.typography.titleMedium.fontFamily, fontSize = MaterialTheme.typography.titleMedium.fontSize, color = MaterialTheme.colorScheme.onPrimary)
+                Icon(painter = painterResource(R.drawable.icon_plus), contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.padding(start = 15.dp))
+            }
         }
 
-        item {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(75.dp)
-                    .background(MaterialTheme.colorScheme.tertiary),
-            ) {
-                Row(
+        LazyColumn(
+            modifier = Modifier
+                .padding(top = 265.dp)
+        ) {
+
+            items(2) { index ->
+                RoundedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp),
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel)}
+                )
+            }
+
+            item {
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(75.dp)
-                        .background(MaterialTheme.colorScheme.tertiary)
-                    ,
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                        .background(MaterialTheme.colorScheme.tertiary),
                 ) {
-                    Text("People have reserved:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(75.dp)
+                            .background(MaterialTheme.colorScheme.tertiary)
+                        ,
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("People have reserved:", style = MaterialTheme.typography.titleMedium, textAlign = TextAlign.Center)
+                    }
                 }
             }
-        }
 
-        items(4) { index ->
-            RoundedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(175.dp)
-                    .padding(start = 10.dp, end = 10.dp)
-            )
+            items(4) { index ->
+                RoundedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp),
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel)}
+                )
+            }
         }
+    }
+    Column(){
+        PopUp(mainViewModel)
     }
 }
 

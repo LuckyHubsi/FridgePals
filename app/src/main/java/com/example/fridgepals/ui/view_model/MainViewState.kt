@@ -6,7 +6,8 @@ import com.example.fridgepals.ui.view.Screen
 
 data class MainViewState (
     val selectedScreen: Screen = Screen.Login,
-    var authenticator: Boolean = false,
+    var authenticator: Boolean = true,
+    val openDialog: Boolean = false,
     var cardColors: List<Color> = List(9) { colors.NotQuiteWhite },
     var imageTints: List<Color> = List(9) { colors.GreenBlue },
     var textColor: List<Color> = List(9) { colors.GreenBlue }

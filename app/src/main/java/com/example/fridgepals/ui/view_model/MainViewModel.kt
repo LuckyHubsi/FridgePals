@@ -29,4 +29,11 @@ class MainViewModel(): ViewModel() {
         _mainViewState.update { it.copy().also { state -> state.toggleColors(index) } }
     }
 
+    fun dismissDialog(){
+        _mainViewState.update { it.copy(openDialog = false) }
+    }
+
+    fun openDialog(){
+        _mainViewState.update { it.copy(openDialog = true) }
+    }
 }

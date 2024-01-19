@@ -11,13 +11,6 @@ import com.example.fridgepals.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily(Font(R.font.cherry_bomb)),
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        lineHeight = 24.sp,
-        letterSpacing = 0.5.sp
-    ),
     titleLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.cherry_bomb)),
         fontWeight = FontWeight.Normal,
@@ -48,5 +41,29 @@ val Typography = Typography(
         fontSize = 11.sp,
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
-    )
+    ),
+    bodyLarge = TextStyle(
+        fontFamily = FontFamily(Font(R.font.dmsans_regular)),
+        fontWeight = FontWeight.ExtraBold,
+        fontSize = 25.sp,
+        lineHeight = 26.sp,
+        letterSpacing = 0.sp,
+        color = colors.DarkBrown
+    ),
+    bodyMedium = TextStyle(
+        fontFamily = FontFamily(Font(R.font.dmsans_regular)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 20.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.sp,
+        color = colors.Brown
+    ),
+    bodySmall = TextStyle(
+        fontFamily = FontFamily(Font(R.font.dmsans_regular)),
+        fontWeight = FontWeight.Normal,
+        fontSize = 15.sp,
+        lineHeight = 12.sp,
+        letterSpacing = 0.sp,
+        color = colors.LightBrown
+    ),
 )

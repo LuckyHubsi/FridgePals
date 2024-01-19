@@ -32,9 +32,9 @@ private val DarkColorScheme = darkColorScheme(
 private val LightColorScheme = lightColorScheme(
     primary = GreenBlue,
     secondary = YellowOrange,
-    tertiary = colors.LightBlue,
+    tertiary = LightBlue,
 
-    onPrimary = colors.NotQuiteWhite,
+    onPrimary = NotQuiteWhite,
 
     onSecondary = DarkBrown,
     onTertiary = Brown,
