@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
@@ -220,11 +221,16 @@ fun RegistrationForm(onRegistrationComplete: (String, String, User) -> Unit, mes
         TextField(value = city, onValueChange = { city = it }, label = { Text("City") })
         TextField(value = street, onValueChange = { street = it }, label = { Text("Street") })
 
-        Button(onClick = {
-            val userAddress = Address(city, street)
-            val user = User(name, email, userAddress, fridge = emptyMap())
-            onRegistrationComplete(email, password, user)
-        }) {
+        Button(
+            onClick = {
+                if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && city.isNotEmpty() && street.isNotEmpty()) {
+                    val userAddress = Address(city, street)
+                    val user = User(name, email, userAddress, fridge = emptyMap())
+                    onRegistrationComplete(email, password, user)
+                }
+            },
+            enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && city.isNotEmpty() && street.isNotEmpty()
+        ) {
             Text("Register")
         }
         if (message.isNotEmpty()) {
@@ -296,16 +302,21 @@ fun AddItemToFridgeForm(
             onValueChange = { pickupTime = it },
             label = { Text("Pickup Time") })
 
-        Button(onClick = {
-            val fridgeItem = FridgeItem(
-                name = itemName,
-                quantity = quantity,
-                category = selectedCategory,
-                pickupDay = pickupDay,
-                pickupTime = pickupTime
-            )
-            onItemAdd(fridgeItem)
-        }) {
+        Button(
+            onClick = {
+                val fridgeItem = FridgeItem(
+                    name = itemName,
+                    quantity = quantity,
+                    category = selectedCategory,
+                    pickupDay = pickupDay,
+                    pickupTime = pickupTime
+                )
+                if (itemName.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickupDay.isNotEmpty() && pickupTime.isNotEmpty()) {
+                    onItemAdd(fridgeItem)
+                }
+            },
+            enabled = itemName.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickupDay.isNotEmpty() && pickupTime.isNotEmpty()
+        ) {
             Text("Add to Fridge")
         }
     }
