@@ -9,10 +9,7 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
 
 object FridgeRepository {
-    fun addItemToFridge(fridgeItem: FridgeItem, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
-        // Get the UID of the currently signed-in user
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return onFailure("User not logged in")
-
+    fun addItemToFridge(userId: String, fridgeItem: FridgeItem, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         // Reference to the user's fridge in the database
         val itemRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge").push()
 
@@ -39,7 +36,17 @@ object FridgeRepository {
         })
     }
 
-    fun getUserSpecificFridgeItems(){
-
+    fun getFridgeItems(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+        val fridgeRef = FirebaseManager.database.reference.child("users").child(userId).child("fridge")
+        fridgeRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val items = snapshot.children.mapNotNull { it.getValue(FridgeItem::class.java) }
+                onSuccess(items)
+            }
+            override fun onCancelled(databaseError: DatabaseError) {
+                onFailure(databaseError.message)
+            }
+        })
     }
+
 }

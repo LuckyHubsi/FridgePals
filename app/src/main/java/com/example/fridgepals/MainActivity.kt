@@ -4,11 +4,17 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -22,7 +28,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
@@ -54,16 +62,18 @@ class MainActivity : ComponentActivity() {
                 ) {
                     // Check if user is logged in and update state
                     mainViewState.isUserLoggedIn = auth.currentUser != null
+                    var userId: String = ""
 
                     // check if a user is currently signed in
                     if (mainViewState.isUserLoggedIn) {
                         val currentUser =
                             auth.currentUser // store currently signed in user in currentUser
                         var userName by remember { mutableStateOf("Loading...") }
+                        var fridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
 
                         if (currentUser != null) {
 
-                            val userId = currentUser.uid // store firebase user uid in userId
+                            userId = currentUser.uid // store firebase user uid in userId
                             val userRef = FirebaseManager.database.reference.child("users")
                                 .child(userId) // store firebase uid in userRef
 
@@ -80,6 +90,13 @@ class MainActivity : ComponentActivity() {
                             })
                         }
 
+                        FridgeRepository.getFridgeItems(userId,
+                            onSuccess = { items ->
+                                fridgeItems = items
+                            },
+                            onFailure = { /* Handle failure */ }
+                        )
+
                         FridgeRepository.getFoodCategories(
                             onSuccess = { categories ->
                                 mainViewState.categories = categories
@@ -90,11 +107,21 @@ class MainActivity : ComponentActivity() {
                         // User is logged in, show add item form
                         AddItemToFridgeForm(userName, mainViewState.categories, { fridgeItem ->
                             // Call function in UserRepository to add item to fridge
-                            FridgeRepository.addItemToFridge(fridgeItem,
+                            FridgeRepository.addItemToFridge(userId, fridgeItem,
                                 onSuccess = { println("added successfully item") },
                                 onFailure = { println("failed") }
                             )
-                        }, { UserRepository.logoutUser() })
+                        }, {
+                            UserRepository.logoutUser()
+                            mainViewState.isUserLoggedIn = false
+                        })
+                        Box(
+                            modifier = Modifier.padding(top=400.dp)
+                        ) {
+                            FridgeItemList(fridgeItems)
+                        }
+
+
                     } else {
 
                         var loginMessage by remember { mutableStateOf("") }
@@ -260,6 +287,40 @@ fun CategoryDropdownMenu(
     }
     Icon(Icons.Default.ArrowDropDown, contentDescription = null)
 }
+
+@Composable
+fun FridgeItemList(fridgeItems: List<FridgeItem>) {
+    if (fridgeItems.isEmpty()) {
+        Text("Your fridge is empty")
+    } else {
+        LazyColumn {
+            items(fridgeItems) { item ->
+                FridgeItemRow(item)
+            }
+        }
+    }
+}
+
+@Composable
+fun FridgeItemRow(item: FridgeItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "Item: ${item.name}")
+            Text(text = "Quantity: ${item.quantity}")
+            Text(text = "Category: ${item.category}")
+            Text(text = "Pickup Day: ${item.pickupDay}")
+            Text(text = "Pickup Time: ${item.pickupTime}")
+        }
+    }
+}
+
+
 
 
 
