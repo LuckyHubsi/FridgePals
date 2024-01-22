@@ -79,6 +79,8 @@ class MainActivity : ComponentActivity() {
                         var fridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var allFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var pickupDay by remember { mutableStateOf("") }
+                        var reservedItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+
 
                         if (currentUser != null) {
 
@@ -153,7 +155,7 @@ class MainActivity : ComponentActivity() {
                                             // handle error
                                         })
                                 })*/
-                                Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
+                               /* Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
                                     AllUsersFridgeItemsList(
                                         allFridgeItems, onReserve = { offeringUserId, itemId ->
                                             val reservingUserId = userId
@@ -166,7 +168,13 @@ class MainActivity : ComponentActivity() {
                                                 {})
                                         }
                                     )
-                                }
+                                }*/
+                            FridgeRepository.getReservations(userId,
+                                onSuccess = { items -> reservedItems = items },
+                                onFailure = { /* Handle failure */ }
+                            )
+                            Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
+                            ReservationsList(reservedItems)}
                             }
                             /*if (currentItemToEdit != null) {
                                 EditFridgeItemDialog(
@@ -543,6 +551,38 @@ fun AllFridgeItemsRow(item: FridgeItem, onReserve: (String, String) -> Unit) {
         }
         Button(onClick = { onReserve(item.ownerId, item.itemId) }) {
             Text("Reserve")
+        }
+    }
+}
+
+@Composable
+fun ReservationsList(reservedItems: List<FridgeItem>) {
+    if (reservedItems.isEmpty()) {
+        Text("You have not reserved any items")
+    } else {
+        LazyColumn {
+            items(reservedItems) { item ->
+                ReservedItemRow(item)
+            }
+        }
+    }
+}
+
+@Composable
+fun ReservedItemRow(item: FridgeItem) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(text = "Item: ${item.name}")
+            Text(text = "Quantity: ${item.quantity}")
+            Text(text = "Category: ${item.category}")
+            Text(text = "Pickup Day: ${item.pickupDay}")
+            Text(text = "Pickup Time: ${item.pickupTime}")
         }
     }
 }

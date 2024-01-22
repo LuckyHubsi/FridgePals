@@ -184,37 +184,65 @@ object FridgeRepository {
             .addOnFailureListener { e -> /* Handle failure to mark item as reserved */ }
     }
 
-    fun getReservations(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
-        val reservationsRef = FirebaseManager.database.reference.child("users").child(userId).child("reservations")
+    fun getReservations(
+        userId: String,
+        onSuccess: (List<FridgeItem>) -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        val reservationsRef =
+            FirebaseManager.database.reference.child("users").child(userId).child("reservations")
         val reservedItems = mutableListOf<FridgeItem>()
 
         reservationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(reservationsSnapshot: DataSnapshot) {
+                val totalReservations = reservationsSnapshot.childrenCount
+                var processedReservations =
+                    0 // needed to compare when all reservations have been run
+
+                if (totalReservations == 0L) {
+                    onSuccess(emptyList()) // no reservations, return empty list
+                    return
+                }
+
                 reservationsSnapshot.children.forEach { reservationSnapshot ->
                     val reservation = reservationSnapshot.getValue(Reservations::class.java)
                     if (reservation != null) {
-                        val itemRef = FirebaseManager.database.reference.child("users").child(reservation.offeringUserId).child("fridge").child(reservation.itemId)
+                        val itemRef = FirebaseManager.database.reference.child("users")
+                            .child(reservation.offeringUserId).child("fridge")
+                            .child(reservation.itemId)
                         itemRef.addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(itemSnapshot: DataSnapshot) {
                                 val item = itemSnapshot.getValue(FridgeItem::class.java)
                                 item?.let { reservedItems.add(it) }
+
+                                processedReservations++
+                                if (processedReservations.toLong() == totalReservations) {
+                                    onSuccess(reservedItems) // all items are processed, return the list
+                                }
                             }
 
                             override fun onCancelled(error: DatabaseError) {
                                 onFailure(error.message)
-                                return
+                                processedReservations++
+                                if (processedReservations.toLong() == totalReservations) {
+                                    onSuccess(reservedItems) // Return what's been processed so far
+                                }
                             }
                         })
+                    } else {
+                        processedReservations++
+                        if (processedReservations.toLong() == totalReservations) {
+                            onSuccess(reservedItems) // All items processed, return the list
+                        }
                     }
                 }
             }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                onFailure(databaseError.message)
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        onFailure(databaseError.message)
+                    }
+                })
             }
-        })
-    }
-
 
 }
 
