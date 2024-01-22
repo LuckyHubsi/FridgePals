@@ -134,7 +134,7 @@ class MainActivity : ComponentActivity() {
                                 mainViewState.isUserLoggedIn = false
                             }, pickupDay,
                                 onPickupDayChange = { newPickupDay -> pickupDay = newPickupDay })
-                            Box(
+                           /* Box(
                                 modifier = Modifier.padding(top = 450.dp)
                             ) {
                                 FridgeItemList(fridgeItems, onEditItem = { item ->
@@ -152,41 +152,51 @@ class MainActivity : ComponentActivity() {
                                         onFailure = { error ->
                                             // handle error
                                         })
-                                })
-                                /*Box(modifier = Modifier.size(300.dp)) {
+                                })*/
+                                Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
                                     AllUsersFridgeItemsList(
-                                        allFridgeItems
-                                    )
-                                }*/
-                            }
-                        }
-                        if (currentItemToEdit != null) {
-                            EditFridgeItemDialog(
-                                categories = mainViewState.categories,
-                                item = currentItemToEdit!!,
-                                onDismiss = { currentItemToEdit = null },
-                                onConfirm = { updatedItem ->
-                                    FridgeRepository.editFridgeItem(userId,
-                                        currentItemToEdit!!.itemId,
-                                        updatedItem,
-                                        onSuccess = {
-                                            FridgeRepository.getFridgeItemsNotReserved(
-                                                userId,
-                                                onSuccess = { items ->
-                                                    fridgeItems = items
-                                                },
-                                                onFailure = { println("failed") })
-                                            currentItemToEdit = null
-                                        },
-                                        onFailure = { error ->
-                                            // Handle error
-                                            currentItemToEdit = null
+                                        allFridgeItems, onReserve = { offeringUserId, itemId ->
+                                            val reservingUserId = userId
+                                            // {}
+                                            FridgeRepository.reserveItem(
+                                                reservingUserId,
+                                                offeringUserId,
+                                                itemId,
+                                                {},
+                                                {})
                                         }
                                     )
                                 }
-                            )
+                            }
+                            /*if (currentItemToEdit != null) {
+                                EditFridgeItemDialog(
+                                    categories = mainViewState.categories,
+                                    item = currentItemToEdit!!,
+                                    onDismiss = { currentItemToEdit = null },
+                                    onConfirm = { updatedItem ->
+                                        FridgeRepository.editFridgeItem(userId,
+                                            currentItemToEdit!!.itemId,
+                                            updatedItem,
+                                            onSuccess = {
+                                                FridgeRepository.getFridgeItemsNotReserved(
+                                                    userId,
+                                                    onSuccess = { items ->
+                                                        fridgeItems = items
+                                                    },
+                                                    onFailure = { println("failed") })
+                                                currentItemToEdit = null
+                                            },
+                                            onFailure = { error ->
+                                                // Handle error
+                                                currentItemToEdit = null
+                                            }
+                                        )
+                                    }
+                                )
 
-                        }
+                            }*/
+
+
 
                     } else {
 
@@ -223,6 +233,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 
 @Composable
 fun RegistrationForm(onRegistrationComplete: (String, String, User) -> Unit, message: String) {
@@ -501,21 +512,21 @@ fun EditFridgeItemDialog(
 }
 
 @Composable
-fun AllUsersFridgeItemsList(fridgeItems: List<FridgeItem>) {
+fun AllUsersFridgeItemsList(fridgeItems: List<FridgeItem>, onReserve: (String, String) -> Unit) {
     if (fridgeItems.isEmpty()) {
         Text("No items available in the community fridge")
     } else {
         Text(text = "This is the community fridge")
-        LazyColumn{
+        LazyColumn {
             items(fridgeItems) { item ->
-                AllFridgeItemsRow(item)
+                AllFridgeItemsRow(item, onReserve)
             }
         }
     }
 }
 
 @Composable
-fun AllFridgeItemsRow(item: FridgeItem) {
+fun AllFridgeItemsRow(item: FridgeItem, onReserve: (String, String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -529,6 +540,9 @@ fun AllFridgeItemsRow(item: FridgeItem) {
             Text(text = "Category: ${item.category}")
             Text(text = "Pickup Day: ${item.pickupDay}")
             Text(text = "Pickup Time: ${item.pickupTime}")
+        }
+        Button(onClick = { onReserve(item.ownerId, item.itemId) }) {
+            Text("Reserve")
         }
     }
 }

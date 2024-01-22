@@ -2,6 +2,7 @@ package com.example.fridgepals.repository
 
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -19,7 +20,10 @@ object FridgeRepository {
         val itemRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge").push()
         // copy of fridgeItem with the itemId and ownerId (for reservations needed)
-        val fridgeItemWithItemAndUserId = fridgeItem.copy(itemId = itemRef.key ?: return onFailure("Failed to generate item ID"), ownerId = userId)
+        val fridgeItemWithItemAndUserId = fridgeItem.copy(
+            itemId = itemRef.key ?: return onFailure("Failed to generate item ID"),
+            ownerId = userId
+        )
 
 
         // Set the value of the new item in the user's fridge
@@ -153,5 +157,34 @@ object FridgeRepository {
             }
         })
     }
+    
+    fun reserveItem(
+        reservingUserId: String,
+        offeringUserId: String,
+        itemId: String,
+        onSuccess: () -> Unit,
+        onFailure: (String) -> Unit
+    ) {
+        // Create a Reservation object
+        val reservations = Reservations(offeringUserId, itemId)
+
+        // Add the reservation to the reserving user's list
+        val reservationRef =
+            FirebaseManager.database.reference.child("users").child(reservingUserId)
+                .child("reservations").push()
+        reservationRef.setValue(reservations)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { e -> onFailure(e.message ?: "Failed to reserve item") }
+
+        // Mark the item as reserved in the offering user's fridge
+        val itemRef =
+            FirebaseManager.database.reference.child("users").child(offeringUserId).child("fridge")
+                .child(itemId)
+        itemRef.updateChildren(mapOf("reserved" to true))
+            .addOnFailureListener { e -> /* Handle failure to mark item as reserved */ }
+    }
+
+    fun
 
 }
+
