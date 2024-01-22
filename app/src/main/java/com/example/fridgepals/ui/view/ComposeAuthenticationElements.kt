@@ -294,3 +294,129 @@ fun getOutlinedTextFieldColors(): TextFieldColors {
         backgroundColor = MaterialTheme.colorScheme.onPrimary
     )
 }
+
+/*
+@Composable
+fun RegisterCard() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.primary)
+            .clickable {
+                // Clear focus when clicking outside text fields
+                focusManager.clearFocus()
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .width(350.dp)
+                .height(500.dp) // Adjusted height for additional fields
+                .shadow(10.dp, shape = RoundedCornerShape(16.dp), ambientColor = MaterialTheme.colorScheme.onSecondary)
+                .background(
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Name TextField
+                OutlinedTextField(
+                    value = EmptyGroup.name,
+                    onValueChange = { newText -> EmptyGroup.name = newText },
+                    label = { androidx.compose.material.Text("Name") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Person, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                    ,
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // City TextField
+                OutlinedTextField(
+                    value = city,
+                    onValueChange = { newText -> city = newText },
+                    label = { androidx.compose.material.Text("City") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Place, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                    ,
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Street TextField
+                OutlinedTextField(
+                    value = street,
+                    onValueChange = { newText -> street = newText },
+                    label = { androidx.compose.material.Text("Street") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                    ,
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Email TextField
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { newText -> email = newText },
+                    label = { androidx.compose.material.Text("Email") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Email, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                    ,
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Password TextField
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { newText -> password = newText },
+                    label = { androidx.compose.material.Text("Password") },
+                    leadingIcon = { Icon(imageVector = Icons.Default.Lock, contentDescription = null) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Register Button
+                Button(
+                    onClick = { mainViewModel.updateAuth() },
+                    modifier = Modifier.fillMaxWidth()
+                        .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
+                        .height(58.dp)
+                    ,
+                ) {
+                    androidx.compose.material.Text(
+                        "Register",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 22.sp
+                    )
+                }
+            }
+        }
+        androidx.compose.material.Text(
+            text = "Already have an account? Login",
+            color = MaterialTheme.colorScheme.onSecondary,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 550.dp)
+                .clickable {
+                    mainViewModel.selectScreen(Screen.Login)
+                }
+        )
+    }
+}*/
