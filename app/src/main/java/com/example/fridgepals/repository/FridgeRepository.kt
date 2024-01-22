@@ -157,7 +157,7 @@ object FridgeRepository {
             }
         })
     }
-    
+
     fun reserveItem(
         reservingUserId: String,
         offeringUserId: String,
@@ -184,7 +184,37 @@ object FridgeRepository {
             .addOnFailureListener { e -> /* Handle failure to mark item as reserved */ }
     }
 
-    fun
+    fun getReservations(userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit) {
+        val reservationsRef = FirebaseManager.database.reference.child("users").child(userId).child("reservations")
+        val reservedItems = mutableListOf<FridgeItem>()
+
+        reservationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(reservationsSnapshot: DataSnapshot) {
+                reservationsSnapshot.children.forEach { reservationSnapshot ->
+                    val reservation = reservationSnapshot.getValue(Reservations::class.java)
+                    if (reservation != null) {
+                        val itemRef = FirebaseManager.database.reference.child("users").child(reservation.offeringUserId).child("fridge").child(reservation.itemId)
+                        itemRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(itemSnapshot: DataSnapshot) {
+                                val item = itemSnapshot.getValue(FridgeItem::class.java)
+                                item?.let { reservedItems.add(it) }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                onFailure(error.message)
+                                return
+                            }
+                        })
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                onFailure(databaseError.message)
+            }
+        })
+    }
+
 
 }
 
