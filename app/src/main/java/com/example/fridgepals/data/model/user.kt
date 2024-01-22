@@ -25,6 +25,7 @@ data class FridgeItem(
 )
 
 data class Reservations(
+    val reservationId: String = "",
     val offeringUserId: String = "",
     val itemId: String = ""
 )

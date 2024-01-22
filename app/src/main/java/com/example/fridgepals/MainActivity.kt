@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.data.model.User
 import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
@@ -80,7 +81,7 @@ class MainActivity : ComponentActivity() {
                         var allFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var pickupDay by remember { mutableStateOf("") }
                         var reservedItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-
+                        var reservations by remember { mutableStateOf<List<Reservations>>(listOf()) }
 
                         if (currentUser != null) {
 
@@ -155,11 +156,10 @@ class MainActivity : ComponentActivity() {
                                             // handle error
                                         })
                                 })*/
-                               /* Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
+                               /*Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
                                     AllUsersFridgeItemsList(
                                         allFridgeItems, onReserve = { offeringUserId, itemId ->
                                             val reservingUserId = userId
-                                            // {}
                                             FridgeRepository.reserveItem(
                                                 reservingUserId,
                                                 offeringUserId,
@@ -170,11 +170,16 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }*/
                             FridgeRepository.getReservations(userId,
-                                onSuccess = { items -> reservedItems = items },
+                                onSuccess = { items ->
+                                            reservedItems = items
+                                            },
                                 onFailure = { /* Handle failure */ }
                             )
-                            Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
-                            ReservationsList(reservedItems)}
+
+                           Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
+                            ReservationsList(reservedItems, reservations, onCancel = { reservationId ->
+                                FridgeRepository.deleteReservation(userId, reservationId, onSuccess = {}, onFailure = {})
+                            })}
                             }
                             /*if (currentItemToEdit != null) {
                                 EditFridgeItemDialog(
@@ -556,20 +561,21 @@ fun AllFridgeItemsRow(item: FridgeItem, onReserve: (String, String) -> Unit) {
 }
 
 @Composable
-fun ReservationsList(reservedItems: List<FridgeItem>) {
+fun ReservationsList(reservedItems: List<FridgeItem>, reservations: List<Reservations>, onCancel: (String) -> Unit) {
+
     if (reservedItems.isEmpty()) {
         Text("You have not reserved any items")
     } else {
         LazyColumn {
             items(reservedItems) { item ->
-                ReservedItemRow(item)
+                ReservedItemRow(item, Reservations(), onCancel)
             }
         }
     }
 }
 
 @Composable
-fun ReservedItemRow(item: FridgeItem) {
+fun ReservedItemRow(item: FridgeItem,reservation: Reservations, onCancel: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -583,6 +589,9 @@ fun ReservedItemRow(item: FridgeItem) {
             Text(text = "Category: ${item.category}")
             Text(text = "Pickup Day: ${item.pickupDay}")
             Text(text = "Pickup Time: ${item.pickupTime}")
+            Button(onClick = { onCancel(reservation.reservationId) }) {
+                Text("Cancel Reservation")
+            }
         }
     }
 }
