@@ -18,10 +18,12 @@ object FridgeRepository {
         // Reference to the user's fridge in the database
         val itemRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge").push()
-        fridgeItem.itemId = itemRef.key ?: return onFailure("Failed to generate item ID")
+        // copy of fridgeItem with the itemId and ownerId (for reservations needed)
+        val fridgeItemWithItemAndUserId = fridgeItem.copy(itemId = itemRef.key ?: return onFailure("Failed to generate item ID"), ownerId = userId)
+
 
         // Set the value of the new item in the user's fridge
-        itemRef.setValue(fridgeItem)
+        itemRef.setValue(fridgeItemWithItemAndUserId)
             .addOnSuccessListener {
                 onSuccess()
             }
