@@ -1,5 +1,6 @@
 package com.example.fridgepals
 
+import android.app.DatePickerDialog
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
@@ -48,6 +50,7 @@ import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
+import java.util.Calendar
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -75,6 +78,7 @@ class MainActivity : ComponentActivity() {
                         var userName by remember { mutableStateOf("Loading...") }
                         var fridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var allFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+                        var pickupDay by remember { mutableStateOf("") }
 
                         if (currentUser != null) {
 
@@ -128,9 +132,10 @@ class MainActivity : ComponentActivity() {
                             }, {
                                 UserRepository.logoutUser()
                                 mainViewState.isUserLoggedIn = false
-                            })
+                            }, pickupDay,
+                                onPickupDayChange = { newPickupDay -> pickupDay = newPickupDay })
                             Box(
-                                modifier = Modifier.padding(top = 400.dp)
+                                modifier = Modifier.padding(top = 450.dp)
                             ) {
                                 FridgeItemList(fridgeItems, onEditItem = { item ->
                                     currentItemToEdit = item // Set the item to be edited
@@ -148,11 +153,11 @@ class MainActivity : ComponentActivity() {
                                             // handle error
                                         })
                                 })
-                                Box(modifier = Modifier.size(300.dp)) {
+                                /*Box(modifier = Modifier.size(300.dp)) {
                                     AllUsersFridgeItemsList(
                                         allFridgeItems
                                     )
-                                }
+                                }*/
                             }
                         }
                         if (currentItemToEdit != null) {
@@ -283,13 +288,17 @@ fun AddItemToFridgeForm(
     userName: String,
     categories: List<String>,
     onItemAdd: (FridgeItem) -> Unit,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    pickupDay: String,
+    onPickupDayChange: (String) -> Unit,
 ) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
     // State variables for form fields
     var itemName by remember { mutableStateOf("") }
     var quantity by remember { mutableStateOf("") }
     var selectedCategory by remember { mutableStateOf("") }
-    var pickupDay by remember { mutableStateOf("") }
+    var newPickupDay by remember { mutableStateOf("") }
     var pickupTime by remember { mutableStateOf("") }
 
     Column {
@@ -312,8 +321,22 @@ fun AddItemToFridgeForm(
         })
         TextField(
             value = pickupDay,
-            onValueChange = { pickupDay = it },
+            onValueChange = { newPickupDay = it },
             label = { Text("Pickup Day") })
+        Button(onClick = {
+            val datePickerDialog = DatePickerDialog(
+                context,
+                { _, year, month, dayOfMonth ->
+                    onPickupDayChange("$dayOfMonth.${month + 1}.$year")
+                },
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH),
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            datePickerDialog.show()
+        }) {
+            Text(if (pickupDay.isNotEmpty()) pickupDay else "Select Pickup Day")
+        }
         TextField(
             value = pickupTime,
             onValueChange = { pickupTime = it },
