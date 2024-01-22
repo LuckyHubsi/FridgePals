@@ -1,16 +1,20 @@
 package com.example.fridgepals.ui.view
 
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,9 +23,11 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -62,13 +68,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fridgepals.R
@@ -424,7 +433,10 @@ fun CustomListView(mainViewModel: MainViewModel) {
 
                 modifier = Modifier
                     .padding(8.dp)
-                    .width(110.dp),
+                    .width(110.dp)
+                ,
+
+                border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary),
 
                 backgroundColor = state.value.cardColors[index],
 
@@ -476,7 +488,7 @@ fun CustomListView(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun ProfileDropdownMenu() {
+fun ProfileDropdownMenu(mainViewModel: MainViewModel) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -501,7 +513,7 @@ fun ProfileDropdownMenu() {
         ) {
             DropdownMenuItem(
                 text = { Text("Edit Profile") },
-                onClick = {  },
+                onClick = { mainViewModel.openEditUser() },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.Edit,
@@ -527,45 +539,171 @@ fun LocationDropdownMenu() {
 
     Box(
         modifier = Modifier
-            .height(75.dp)
-            .width(350.dp)
-            .wrapContentSize(Alignment.TopStart)
-            .background(Color.Red)
-        ,
-        ) {
+            .height(65.dp)
+            .width(350.dp),
+        contentAlignment = Alignment.TopCenter
+    ) {
         TextButton(onClick = { expanded = true }) {
-            Text("St. Pölten")
+            Text("St. Pölten", style = MaterialTheme.typography.titleLarge, fontSize = 36.sp, textDecoration = TextDecoration.Underline)
         }
 
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.onPrimary)
-                .offset(y = 50.dp) // Set the desired vertical offset here
+                .offset(x = (-100).dp, y = 60.dp)
         ) {
             DropdownMenu(
+                modifier = Modifier.width(200.dp).heightIn(max = 300.dp),
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                DropdownMenuItem(
-                    text = { Text("Edit Profile") },
-                    onClick = {  },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.Edit,
-                            contentDescription = null
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    repeat(10) { index -> // Adjust the number of items for testing
+                        DropdownMenuItem(
+                            text = { Text("Location $index") },
+                            onClick = { /* Handle click */ },
                         )
-                    })
-                DropdownMenuItem(
-                    text = { Text("Logout") },
-                    onClick = {  },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.ExitToApp,
-                            contentDescription = null
-                        )
-                    })
+                    }
+                }
             }
         }
     }
 }
 
+
+
+@Composable
+fun EditUserPopup(mainViewModel: MainViewModel) {
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    var name by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var city by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var street by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
+
+
+    if (state.value.openEditUser)
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            onDismissRequest = { mainViewModel.dismissEditUser() },
+            confirmButton = {},
+            text = {
+                Column(
+                ) {
+                    // Name TextField
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { newText -> name = newText },
+                        label = { androidx.compose.material.Text("Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    // City TextField
+                    OutlinedTextField(
+                        value = city,
+                        onValueChange = { newText -> city = newText },
+                        label = { androidx.compose.material.Text("Quantity") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    // Street TextField
+                    OutlinedTextField(
+                        value = street,
+                        onValueChange = { newText -> street = newText },
+                        label = { androidx.compose.material.Text("Category") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    // Email TextField
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { newText -> email = newText },
+                        label = { androidx.compose.material.Text("Pick-up date") },
+                        /*                        trailingIcon = {
+                                                    Icon(
+                                                        imageVector = Icons.Default.DateRange,
+                                                        contentDescription = null
+                                                    )
+                                                },*/
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 25.dp)
+                        ,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = { mainViewModel.dismissEditUser() },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(60.dp)
+                                .padding(top = 5.dp)
+                                .shadow(
+                                    5.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                                )
+                                .clip(RoundedCornerShape(20.dp))
+                            ,
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                            shape = RectangleShape,
+                        ) {
+                            androidx.compose.material.Text(
+                                "Cancel",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 20.sp
+                            )
+                        }
+
+
+                        Button(
+                            onClick = { mainViewModel.dismissEditUser() },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(60.dp)
+                                .padding(top = 5.dp)
+                                .shadow(
+                                    5.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                                )
+                                .clip(RoundedCornerShape(20.dp)),
+                            shape = RectangleShape
+                        ) {
+                            androidx.compose.material.Text(
+                                text = "Save",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                }
+            }
+        )
+}

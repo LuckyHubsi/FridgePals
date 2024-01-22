@@ -72,7 +72,7 @@ fun OwnFridge(mainViewModel: MainViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally),
             ) {
                 Text("Hi, $username !", style = MaterialTheme.typography.titleLarge)
-                ProfileDropdownMenu()
+                ProfileDropdownMenu(mainViewModel)
             }
             Row(
                 modifier = Modifier
@@ -159,6 +159,9 @@ fun OwnFridge(mainViewModel: MainViewModel) {
     }
     Column(){
         PopUp(mainViewModel)
+    }
+    Column(){
+        EditUserPopup(mainViewModel)
     }
 }
 

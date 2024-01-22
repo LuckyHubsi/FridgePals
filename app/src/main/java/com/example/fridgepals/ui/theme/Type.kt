@@ -15,7 +15,7 @@ val Typography = Typography(
         fontFamily = FontFamily(Font(R.font.cherry_bomb)),
         fontWeight = FontWeight.Normal,
         fontSize = 42.sp,
-        lineHeight = 52.sp,
+        lineHeight = 48.sp,
         letterSpacing = 0.sp,
         color = colors.NotQuiteWhite
     ),
