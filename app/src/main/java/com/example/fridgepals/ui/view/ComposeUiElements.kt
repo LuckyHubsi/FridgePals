@@ -87,7 +87,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.fridgepals.R
+import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 import java.util.Calendar
 
@@ -506,7 +508,7 @@ fun CustomListView(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun ProfileDropdownMenu(mainViewModel: MainViewModel) {
+fun ProfileDropdownMenu(mainViewModel: MainViewModel, onLogout: () -> Unit, navController: NavController) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -540,7 +542,10 @@ fun ProfileDropdownMenu(mainViewModel: MainViewModel) {
                 })
             DropdownMenuItem(
                 text = { Text("Logout") },
-                onClick = { /* Handle settings! */ },
+                onClick = {
+                    onLogout()
+                    navController.navigate(Screen.Login.route)
+                          },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.ExitToApp,

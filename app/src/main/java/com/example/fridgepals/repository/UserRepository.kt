@@ -2,6 +2,7 @@ package com.example.fridgepals.repository
 
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.User
+import com.example.fridgepals.ui.view.Login
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -65,7 +66,6 @@ object UserRepository {
             }
         })
     }
-
 
     fun logoutUser() {
         auth.signOut()

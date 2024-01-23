@@ -22,11 +22,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.R
+import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 
@@ -39,7 +41,7 @@ sealed class Screen(val route: String){
 }
 
 @Composable
-fun MainView(mainViewModel: MainViewModel){
+fun MainView(mainViewModel: MainViewModel, navController: NavController){
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
 
@@ -53,7 +55,7 @@ fun MainView(mainViewModel: MainViewModel){
         ){
             composable(Screen.First.route){
                 mainViewModel.selectScreen(Screen.First)
-                OwnFridge(mainViewModel)
+                OwnFridge(mainViewModel, navController)
             }
             composable(Screen.Second.route){
                 mainViewModel.selectScreen(Screen.Second)
@@ -65,7 +67,14 @@ fun MainView(mainViewModel: MainViewModel){
             }
             composable(Screen.Login.route){
                 mainViewModel.selectScreen(Screen.Login)
-                Login(mainViewModel)
+                Login(mainViewModel, onLoginComplete = { email, password ->
+                    UserRepository.loginUser(email, password,
+                        onSuccess = {
+                        },
+                        onFailure = {
+                        }
+                    )
+                })
             }
             composable(Screen.Register.route){
                 mainViewModel.selectScreen(Screen.Register)

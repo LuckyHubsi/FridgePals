@@ -45,10 +45,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.fridgepals.repository.UserRepository
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun OwnFridge(mainViewModel: MainViewModel) {
+fun OwnFridge(mainViewModel: MainViewModel, navController: NavController) {
     val username = "Ivy"
 
     Box(
@@ -72,7 +74,7 @@ fun OwnFridge(mainViewModel: MainViewModel) {
                 horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally),
             ) {
                 Text("Hi, $username !", style = MaterialTheme.typography.titleLarge)
-                ProfileDropdownMenu(mainViewModel)
+                ProfileDropdownMenu(mainViewModel, {UserRepository.logoutUser()}, navController)
             }
             Row(
                 modifier = Modifier

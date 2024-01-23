@@ -1,17 +1,11 @@
 package com.example.fridgepals.ui.view_model
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.fridgepals.ui.view.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 class MainViewModel(): ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
@@ -22,7 +16,7 @@ class MainViewModel(): ViewModel() {
     }
 
     fun updateAuth() {
-        _mainViewState.update { it.copy(authenticator = true) }
+        _mainViewState.update { it.copy(isUserLoggedIn = true) }
     }
 
     fun toggleColors(index: Int) {
