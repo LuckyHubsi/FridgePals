@@ -1,5 +1,6 @@
 package com.example.fridgepals.repository
 
+import android.util.Log
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.User
 import com.example.fridgepals.ui.view.Login

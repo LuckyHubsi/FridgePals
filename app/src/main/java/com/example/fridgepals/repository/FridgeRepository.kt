@@ -131,7 +131,7 @@ object FridgeRepository {
         onFailure: (String) -> Unit
     ) {
         val usersRef = FirebaseManager.database.reference.child("users")
-        val allFridgeItems = mutableListOf<FridgeItem>()
+        val communityFridgeItems = mutableListOf<FridgeItem>()
 
         usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
@@ -143,12 +143,12 @@ object FridgeRepository {
                             val item = itemSnapshot.getValue(FridgeItem::class.java)
                             // Check if the item is not reserved before adding it
                             if (item != null && !item.reserved) {
-                                allFridgeItems.add(item)
+                                communityFridgeItems.add(item)
                             }
                         }
                     }
                 }
-                onSuccess(allFridgeItems)
+                onSuccess(communityFridgeItems)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

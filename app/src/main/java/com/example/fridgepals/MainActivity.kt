@@ -9,11 +9,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
+import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
 import com.example.fridgepals.ui.view.MainView
@@ -34,13 +35,55 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 
         val mainViewModel = MainViewModel()
+        var userId: String = ""
 
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
 
 
         setContent {
-            val navController = rememberNavController()
+            val currentUser = auth.currentUser
+            userId = currentUser?.uid.toString()
+            var communityFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+            var ownFridgeItemsNotReserved by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+            var ownFridgeItemsReserved by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+            var reservedItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
+            var reservationsList by remember { mutableStateOf<List<Reservations>>(listOf()) }
+
+            FridgeRepository.getFridgeItemsNotReserved(userId,
+            onSuccess = { items ->
+                ownFridgeItemsNotReserved = items
+            },
+            onFailure = { /* Handle failure */ }
+            )
+
+            FridgeRepository.getFridgeItemsReserved(userId,
+                onSuccess = { items ->
+                    ownFridgeItemsReserved = items
+                },
+                onFailure = { /* Handle failure */ }
+            )
+
+            FridgeRepository.getCommunityFridge(
+                currentUserId = userId,
+                onSuccess = { items ->
+                    communityFridgeItems = items
+                },
+                onFailure = { /* Handle failure */ }
+            )
+
+            FridgeRepository.getReservedItems(userId,
+                onSuccess = { items ->
+                    reservedItems = items
+                },
+                onFailure = { /* Handle failure */ }
+            )
+
+            FridgeRepository.getReservations(userId,
+                onSuccess = {   reservations ->
+                    reservationsList = reservations
+                },
+                onFailure = { /* Handle Failure */})
 
             FridgePalsTheme {
                 Surface(
@@ -51,7 +94,7 @@ class MainActivity : ComponentActivity() {
 
 
                     if (auth.currentUser != null) {
-                        MainView(mainViewModel, navController)
+                        MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
                     } else
                 // Display the appropriate screen based on selectedScreen
                 when (state.value.selectedScreen) {

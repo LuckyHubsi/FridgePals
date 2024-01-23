@@ -28,6 +28,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.R
+import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
@@ -41,7 +43,7 @@ sealed class Screen(val route: String){
 }
 
 @Composable
-fun MainView(mainViewModel: MainViewModel, navController: NavController){
+fun MainView(mainViewModel: MainViewModel, communityFridgeItems: List<FridgeItem>, ownFridgeItemsNotReserved: List<FridgeItem>, ownFridgeItemsReserved: List<FridgeItem>, reservedItems: List<FridgeItem>, reservationsList: List<Reservations>){
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
 
@@ -55,15 +57,15 @@ fun MainView(mainViewModel: MainViewModel, navController: NavController){
         ){
             composable(Screen.First.route){
                 mainViewModel.selectScreen(Screen.First)
-                OwnFridge(mainViewModel, navController)
+                OwnFridge(mainViewModel, navController, ownFridgeItemsNotReserved, ownFridgeItemsReserved)
             }
             composable(Screen.Second.route){
                 mainViewModel.selectScreen(Screen.Second)
-                CommunityFridge(mainViewModel)
+                CommunityFridge(mainViewModel, communityFridgeItems)
             }
             composable(Screen.Third.route){
                 mainViewModel.selectScreen(Screen.Third)
-                ReservedItems(mainViewModel)
+                ReservedItems(mainViewModel, reservedItems, reservationsList)
             }
             composable(Screen.Login.route){
                 mainViewModel.selectScreen(Screen.Login)

@@ -40,18 +40,28 @@ import androidx.compose.ui.unit.dp
 import com.example.fridgepals.R
 import com.example.fridgepals.ui.view_model.MainViewModel
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.repository.UserRepository
 
 @SuppressLint("SuspiciousIndentation")
 @Composable
-fun OwnFridge(mainViewModel: MainViewModel, navController: NavController) {
-    val username = "Ivy"
+fun OwnFridge(mainViewModel: MainViewModel, navController: NavController, ownFridgeItemsNotReserved: List<FridgeItem>, ownFridgeItemsReserved: List<FridgeItem>) {
+    var username by remember { mutableStateOf("Loading...") }
+
+    UserRepository.getUsername { name ->
+        username = name
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -73,7 +83,7 @@ fun OwnFridge(mainViewModel: MainViewModel, navController: NavController) {
                     .padding(top = 10.dp, start = 10.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally),
             ) {
-                Text("Hi, $username !", style = MaterialTheme.typography.titleLarge)
+                Text("Hi, $username!", style = MaterialTheme.typography.titleLarge)
                 ProfileDropdownMenu(mainViewModel, {UserRepository.logoutUser()}, navController)
             }
             Row(
@@ -119,12 +129,13 @@ fun OwnFridge(mainViewModel: MainViewModel, navController: NavController) {
                 .padding(top = 265.dp)
         ) {
 
-            items(2) { index ->
+            items(ownFridgeItemsNotReserved) { index ->
                 RoundedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel)}
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel)},
+                    item = index
                 )
             }
 
@@ -149,12 +160,13 @@ fun OwnFridge(mainViewModel: MainViewModel, navController: NavController) {
                 }
             }
 
-            items(4) { index ->
+            items(ownFridgeItemsReserved) { index ->
                 RoundedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel)}
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel)},
+                    item = index
                 )
             }
         }

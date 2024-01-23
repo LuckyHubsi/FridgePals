@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,10 +24,11 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 @Composable
-fun CommunityFridge(mainViewModel: MainViewModel) {
+fun CommunityFridge(mainViewModel: MainViewModel, fridgeItems: List<FridgeItem>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -76,12 +78,13 @@ fun CommunityFridge(mainViewModel: MainViewModel) {
     ) {
 
 
-        items(8) { index ->
+        items(fridgeItems) { index ->
             RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp),
-                buttonContent = { ButtonContentCommunityFridge() }
+                buttonContent = { ButtonContentCommunityFridge() },
+                item = index
             )
         }
     }

@@ -89,6 +89,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
+import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 import java.util.Calendar
@@ -99,7 +100,8 @@ fun RoundedCard(
     imageModifier: Modifier = Modifier,
     onEditClick: () -> Unit = {},
     onRemoveClick: () -> Unit = {},
-    buttonContent: @Composable () -> Unit
+    buttonContent: @Composable () -> Unit,
+    item: FridgeItem
 ) {
     Box(
         modifier = modifier
@@ -138,15 +140,15 @@ fun RoundedCard(
                     .padding(start = 8.dp)
             ) {
                 androidx.compose.material3.Text(
-                    "Item Name",
+                    "${item.quantity} ${item.name}",
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 androidx.compose.material3.Text(
-                    "Location",
+                    "${item.category}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 androidx.compose.material3.Text(
-                    "Date",
+                    "${item.pickupDay}, ${item.pickupTime}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }

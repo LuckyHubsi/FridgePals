@@ -19,10 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.view_model.MainViewModel
+import androidx.compose.foundation.lazy.items
 
 @Composable
-fun ReservedItems(mainViewModel: MainViewModel) {
+fun ReservedItems(mainViewModel: MainViewModel, reservedItems: List<FridgeItem>, reservationsList: List<Reservations>) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -47,14 +50,16 @@ fun ReservedItems(mainViewModel: MainViewModel) {
     ) {
 
 
-        items(8) { index ->
-            RoundedCard(
+        items(reservedItems) { index ->
+            val reservation = reservationsList.find {it.itemId == index.itemId}
+            reservation?.let {
+                RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp),
-                buttonContent = { ButtonContentReservedItems() }
-            )
+                buttonContent = { ButtonContentReservedItems() },
+                item = index
+            ) }
         }
-
     }
 }
