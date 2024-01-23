@@ -1,5 +1,6 @@
 package com.example.fridgepals.ui.view_model
 
+<<<<<<< HEAD
 import androidx.compose.ui.graphics.Color
 import com.example.fridgepals.ui.theme.colors
 import com.example.fridgepals.ui.view.Screen
@@ -24,3 +25,10 @@ data class MainViewState (
         textColor = textColor.toMutableList().also { it[index] = newColorText }
     }
 }
+=======
+data class MainViewState (
+    var isUserLoggedIn: Boolean = false,
+    var categories: List<String> = listOf(), // List of category names
+    var selectedCategory: String = "" // selected category name
+)
+>>>>>>> firebase_copy
