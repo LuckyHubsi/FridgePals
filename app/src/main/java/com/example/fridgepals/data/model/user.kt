@@ -5,7 +5,7 @@ data class User(
     val email: String = "",
     val address: Address = Address(),
     val fridge: Map<String, FridgeItem> = emptyMap(),
-    val reservations: Reservations = Reservations()
+    val reservations: Map<String, Reservations> = emptyMap()
 )
 
 data class Address(

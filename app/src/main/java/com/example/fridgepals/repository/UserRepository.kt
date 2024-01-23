@@ -3,6 +3,9 @@ package com.example.fridgepals.repository
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 
 object UserRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -45,6 +48,24 @@ object UserRepository {
                 }
             }
     }
+
+    fun getUsername(onResult: (String) -> Unit) {
+        val currentUser = auth.currentUser
+        val userId = currentUser?.uid ?: return onResult("Unknown")
+
+        val userRef = FirebaseManager.database.reference.child("users").child(userId)
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val user = snapshot.getValue(User::class.java)
+                onResult(user?.name ?: "Unknown")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onResult("Error fetching name")
+            }
+        })
+    }
+
 
     fun logoutUser() {
         auth.signOut()

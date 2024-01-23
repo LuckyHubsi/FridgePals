@@ -22,18 +22,16 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.fridgepals.data.FirebaseManager
@@ -76,31 +74,19 @@ class MainActivity : ComponentActivity() {
                     if (mainViewState.isUserLoggedIn) {
                         val currentUser =
                             auth.currentUser // store currently signed in user in currentUser
-                        var userName by remember { mutableStateOf("Loading...") }
+                        userId = currentUser?.uid.toString()
                         var fridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var allFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
                         var pickupDay by remember { mutableStateOf("") }
                         var reservedItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-                        var reservations by remember { mutableStateOf<List<Reservations>>(listOf()) }
+                        var reservationsList by remember { mutableStateOf<List<Reservations>>(listOf()) }
+                        var userName by remember { mutableStateOf("Loading...") }
 
                         if (currentUser != null) {
 
-                            userId = currentUser.uid // store firebase user uid in userId
-                            val userRef = FirebaseManager.database.reference.child("users")
-                                .child(userId) // store firebase uid in userRef
-
-                            // get user's name from the realtime database and store it in userName
-                            userRef.addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    val user = snapshot.getValue(User::class.java)
-                                    userName = user?.name ?: "Unknown"
-                                }
-
-                                override fun onCancelled(error: DatabaseError) {
-                                    userName = "Error fetching name"
-                                }
-                            })
-
+                            UserRepository.getUsername { name ->
+                                userName = name
+                            }
 
                             FridgeRepository.getFridgeItemsNotReserved(userId,
                                 onSuccess = { items ->
@@ -156,7 +142,7 @@ class MainActivity : ComponentActivity() {
                                             // handle error
                                         })
                                 })*/
-                               /*Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
+                              /* Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
                                     AllUsersFridgeItemsList(
                                         allFridgeItems, onReserve = { offeringUserId, itemId ->
                                             val reservingUserId = userId
@@ -169,15 +155,22 @@ class MainActivity : ComponentActivity() {
                                         }
                                     )
                                 }*/
-                            FridgeRepository.getReservations(userId,
+                          FridgeRepository.getReservedItems(userId,
                                 onSuccess = { items ->
                                             reservedItems = items
                                             },
                                 onFailure = { /* Handle failure */ }
                             )
 
-                           Box(modifier = Modifier.size(300.dp).padding(top = 475.dp)) {
-                            ReservationsList(reservedItems, reservations, onCancel = { reservationId ->
+                            FridgeRepository.getReservations(userId,
+                                onSuccess = {   reservations ->
+                                    reservationsList = reservations
+                                },
+                                onFailure = { /* Handle Failure */})
+
+                          Box(modifier = Modifier
+                              .size(300.dp)
+                              .padding(top = 475.dp)) { ReservationsList(reservedItems, reservationsList, onCancel = { reservationId ->
                                 FridgeRepository.deleteReservation(userId, reservationId, onSuccess = {}, onFailure = {})
                             })}
                             }
@@ -563,19 +556,21 @@ fun AllFridgeItemsRow(item: FridgeItem, onReserve: (String, String) -> Unit) {
 @Composable
 fun ReservationsList(reservedItems: List<FridgeItem>, reservations: List<Reservations>, onCancel: (String) -> Unit) {
 
-    if (reservedItems.isEmpty()) {
+    if (reservations.isEmpty()) {
         Text("You have not reserved any items")
     } else {
         LazyColumn {
             items(reservedItems) { item ->
-                ReservedItemRow(item, Reservations(), onCancel)
+                // Find the corresponding reservation
+                val reservation = reservations.find {it.itemId == item.itemId}
+                reservation?.let {ReservedItemRow(item, it, onCancel)}
             }
         }
     }
 }
 
 @Composable
-fun ReservedItemRow(item: FridgeItem,reservation: Reservations, onCancel: (String) -> Unit) {
+fun ReservedItemRow(item: FridgeItem,reservations: Reservations, onCancel: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -589,7 +584,7 @@ fun ReservedItemRow(item: FridgeItem,reservation: Reservations, onCancel: (Strin
             Text(text = "Category: ${item.category}")
             Text(text = "Pickup Day: ${item.pickupDay}")
             Text(text = "Pickup Time: ${item.pickupTime}")
-            Button(onClick = { onCancel(reservation.reservationId) }) {
+            Button(onClick = { onCancel(reservations.reservationId) }) {
                 Text("Cancel Reservation")
             }
         }

@@ -3,7 +3,6 @@ package com.example.fridgepals.repository
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -177,8 +176,8 @@ object FridgeRepository {
             return
         }
 
-        val reservations = Reservations(reservationId, offeringUserId, itemId)
-        reservationRef.setValue(reservations)
+        val reservation = Reservations(reservationId, offeringUserId, itemId)
+        reservationRef.setValue(reservation)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to reserve item") }
 
@@ -190,7 +189,7 @@ object FridgeRepository {
             .addOnFailureListener { e -> /* Handle failure to mark item as reserved */ }
     }
 
-    fun getReservations(
+    fun getReservedItems(
         userId: String,
         onSuccess: (List<FridgeItem>) -> Unit,
         onFailure: (String) -> Unit
@@ -250,6 +249,33 @@ object FridgeRepository {
         })
     }
 
+    fun getReservations(
+        userId: String,
+        onSuccess: (List<Reservations>) -> Unit,
+        onFailure: (String) -> Unit) {
+        val reservationsRef = FirebaseManager.database.reference.child("users").child(userId).child("reservations")
+        val reservationsList = mutableListOf<Reservations>()
+
+        reservationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                snapshot.children.forEach { dataSnapshot ->
+                    dataSnapshot.getValue(Reservations::class.java)?.let {
+                        reservationsList.add(it)
+                    }
+                }
+                if (reservationsList.isEmpty()) {
+                    onFailure("No reservations found")
+                } else {
+                    onSuccess(reservationsList)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                onFailure(databaseError.message)
+            }
+        })
+    }
+
     fun deleteReservation(
         userId: String,
         reservationId: String,
@@ -297,4 +323,5 @@ object FridgeRepository {
         })
     }
 }
+
 
