@@ -34,8 +34,10 @@ import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MoreVert
@@ -51,11 +53,15 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,6 +89,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fridgepals.R
 import com.example.fridgepals.ui.view_model.MainViewModel
+import java.util.Calendar
 
 @Composable
 fun RoundedCard(
@@ -252,6 +259,7 @@ fun ButtonContentReservedItems() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PopUp(mainViewModel: MainViewModel) {
     val state = mainViewModel.mainViewState.collectAsState()
@@ -272,6 +280,9 @@ fun PopUp(mainViewModel: MainViewModel) {
         mutableStateOf(TextFieldValue(""))
     }
 
+    val selectedDate = remember { mutableStateOf(Calendar.getInstance()) }
+    val isDatePickerVisible = remember { mutableStateOf(false) }
+
     if (state.value.openDialog)
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.secondary,
@@ -280,7 +291,7 @@ fun PopUp(mainViewModel: MainViewModel) {
             text = {
                 Column(
                 ) {
-                    // Name TextField
+                    // Name
                     OutlinedTextField(
                         value = name,
                         onValueChange = { newText -> name = newText },
@@ -291,7 +302,7 @@ fun PopUp(mainViewModel: MainViewModel) {
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    // City TextField
+                    // Quantity
                     OutlinedTextField(
                         value = quantity,
                         onValueChange = { newText -> quantity = newText },
@@ -302,7 +313,7 @@ fun PopUp(mainViewModel: MainViewModel) {
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    // Street TextField
+                    // Category
                     OutlinedTextField(
                         value = category,
                         onValueChange = { newText -> category = newText },
@@ -313,33 +324,38 @@ fun PopUp(mainViewModel: MainViewModel) {
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    // Email TextField
+                    // Pickup Date
                     OutlinedTextField(
                         value = pickup_date,
                         onValueChange = { newText -> pickup_date = newText },
                         label = { androidx.compose.material.Text("Pick-up date") },
-/*                        trailingIcon = {
+                        trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.DateRange,
                                 contentDescription = null
                             )
-                        },*/
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                         colors = getOutlinedTextFieldColors()
                     )
-
-                    // Password TextField
+                    
+                    // Pickup Time
                     OutlinedTextField(
                         value = pickup_time,
                         onValueChange = { newText -> pickup_time = newText },
                         label = { androidx.compose.material.Text("Pick-up time") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Face,
+                                contentDescription = null
+                            )
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        visualTransformation = PasswordVisualTransformation(),
                         colors = getOutlinedTextFieldColors()
                     )
                     Row(
@@ -545,8 +561,24 @@ fun LocationDropdownMenu() {
             .width(350.dp),
         contentAlignment = Alignment.TopCenter
     ) {
-        TextButton(onClick = { expanded = true }) {
-            Text("St. Pölten", style = MaterialTheme.typography.titleLarge, fontSize = 36.sp, textDecoration = TextDecoration.Underline)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            TextButton(onClick = { expanded = true }) {
+                Text(
+                    "St. Pölten",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontSize = 36.sp,
+                    textDecoration = TextDecoration.Underline
+                )
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary, // Customize the color if needed
+                    modifier = Modifier.size(48.dp) // Adjust the size if needed
+                )
+            }
         }
 
         Box(
@@ -593,116 +625,136 @@ fun EditUserPopup(mainViewModel: MainViewModel) {
         mutableStateOf(TextFieldValue(""))
     }
 
+    val focusManager = LocalFocusManager.current
 
     if (state.value.openEditUser)
         AlertDialog(
+            modifier = Modifier.clickable{ focusManager.clearFocus() },
             containerColor = MaterialTheme.colorScheme.secondary,
             onDismissRequest = { mainViewModel.dismissEditUser() },
             confirmButton = {},
             text = {
                 Column(
                 ) {
-                    // Name TextField
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { newText -> name = newText },
-                        label = { androidx.compose.material.Text("Name") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    // City TextField
-                    OutlinedTextField(
-                        value = city,
-                        onValueChange = { newText -> city = newText },
-                        label = { androidx.compose.material.Text("Quantity") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    // Street TextField
-                    OutlinedTextField(
-                        value = street,
-                        onValueChange = { newText -> street = newText },
-                        label = { androidx.compose.material.Text("Category") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    // Email TextField
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { newText -> email = newText },
-                        label = { androidx.compose.material.Text("Pick-up date") },
-                        /*                        trailingIcon = {
-                                                    Icon(
-                                                        imageVector = Icons.Default.DateRange,
-                                                        contentDescription = null
-                                                    )
-                                                },*/
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 25.dp)
-                        ,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        Button(
-                            onClick = { mainViewModel.dismissEditUser() },
-                            modifier = Modifier
-                                .width(125.dp)
-                                .height(60.dp)
-                                .padding(top = 5.dp)
-                                .shadow(
-                                    5.dp,
-                                    shape = RoundedCornerShape(20.dp),
-                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                        // Name TextField
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = { newText -> name = newText },
+                            label = { androidx.compose.material.Text("Name") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = null
                                 )
-                                .clip(RoundedCornerShape(20.dp))
-                            ,
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                            shape = RectangleShape,
-                        ) {
-                            androidx.compose.material.Text(
-                                "Cancel",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
-                            )
-                        }
-
-
-                        Button(
-                            onClick = { mainViewModel.dismissEditUser() },
+                            },
                             modifier = Modifier
-                                .width(125.dp)
-                                .height(60.dp)
-                                .padding(top = 5.dp)
-                                .shadow(
-                                    5.dp,
-                                    shape = RoundedCornerShape(20.dp),
-                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            colors = getOutlinedTextFieldColors()
+                        )
+
+                        // City TextField
+                        OutlinedTextField(
+                            value = city,
+                            onValueChange = { newText -> city = newText },
+                            label = { androidx.compose.material.Text("City") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Place,
+                                    contentDescription = null
                                 )
-                                .clip(RoundedCornerShape(20.dp)),
-                            shape = RectangleShape
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            colors = getOutlinedTextFieldColors()
+                        )
+
+                        // Street TextField
+                        OutlinedTextField(
+                            value = street,
+                            onValueChange = { newText -> street = newText },
+                            label = { androidx.compose.material.Text("Street") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Home,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            colors = getOutlinedTextFieldColors()
+                        )
+
+                        // Email TextField
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = { newText -> email = newText },
+                            label = { androidx.compose.material.Text("Email") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp),
+                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                            colors = getOutlinedTextFieldColors()
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 25.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            androidx.compose.material.Text(
-                                text = "Save",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
-                            )
+                            Button(
+                                onClick = { mainViewModel.dismissEditUser() },
+                                modifier = Modifier
+                                    .width(125.dp)
+                                    .height(60.dp)
+                                    .padding(top = 5.dp)
+                                    .shadow(
+                                        5.dp,
+                                        shape = RoundedCornerShape(20.dp),
+                                        ambientColor = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                    .clip(RoundedCornerShape(20.dp)),
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                                shape = RectangleShape,
+                            ) {
+                                androidx.compose.material.Text(
+                                    "Cancel",
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontSize = 20.sp
+                                )
+                            }
+
+                            Button(
+                                onClick = { mainViewModel.dismissEditUser() },
+                                modifier = Modifier
+                                    .width(125.dp)
+                                    .height(60.dp)
+                                    .padding(top = 5.dp)
+                                    .shadow(
+                                        5.dp,
+                                        shape = RoundedCornerShape(20.dp),
+                                        ambientColor = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                    .clip(RoundedCornerShape(20.dp)),
+                                shape = RectangleShape
+                            ) {
+                                androidx.compose.material.Text(
+                                    text = "Save",
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    fontSize = 20.sp
+                                )
+                            }
                         }
                     }
                 }
