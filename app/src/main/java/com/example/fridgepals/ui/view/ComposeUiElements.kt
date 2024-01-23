@@ -49,6 +49,7 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -171,7 +172,8 @@ fun ButtonContentOwnFridge(mainViewModel: MainViewModel) {
                 ambientColor = MaterialTheme.colorScheme.onSecondary
             )
             .clip(RoundedCornerShape(20.dp)),
-        shape = RectangleShape
+        shape = RectangleShape,
+        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary)
     ) {
         androidx.compose.material.Text(
             "Remove",
