@@ -26,24 +26,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-<<<<<<< HEAD
 import androidx.compose.runtime.collectAsState
-=======
 import androidx.compose.runtime.LaunchedEffect
->>>>>>> firebase_copy
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-<<<<<<< HEAD
 import androidx.compose.ui.text.font.FontFamily
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-=======
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
->>>>>>> firebase_copy
 import com.example.fridgepals.data.FirebaseManager
 import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
@@ -52,14 +46,11 @@ import com.example.fridgepals.data.model.User
 import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
-<<<<<<< HEAD
 import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Login
 import com.example.fridgepals.ui.view.Register
 import com.example.fridgepals.ui.view.Screen
 import com.example.fridgepals.ui.view_model.MainViewModel
-import com.example.fridgepals.ui.view_model.MainViewState
-=======
 import com.example.fridgepals.ui.view_model.MainViewState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -68,7 +59,6 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import java.util.Calendar
->>>>>>> firebase_copy
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -88,7 +78,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-<<<<<<< HEAD
                     val state = mainViewModel.mainViewState.collectAsState()
 
                     if (state.value.authenticator) {
@@ -105,7 +94,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-=======
+/*
                     // Check if user is logged in and update state
                     mainViewState.isUserLoggedIn = auth.currentUser != null
                     var userId: String = ""
@@ -631,4 +620,5 @@ fun ReservedItemRow(item: FridgeItem,reservations: Reservations, onCancel: (Stri
     }
 }
 
->>>>>>> firebase_copy
+ */
+

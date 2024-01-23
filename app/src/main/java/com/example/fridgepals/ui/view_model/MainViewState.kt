@@ -1,6 +1,5 @@
 package com.example.fridgepals.ui.view_model
 
-<<<<<<< HEAD
 import androidx.compose.ui.graphics.Color
 import com.example.fridgepals.ui.theme.colors
 import com.example.fridgepals.ui.view.Screen
@@ -10,6 +9,9 @@ data class MainViewState (
     var authenticator: Boolean = false,
     val openDialog: Boolean = false,
     val openEditUser: Boolean = false,
+    var isUserLoggedIn: Boolean = false,
+    var categories: List<String> = listOf(), // List of category names
+    var selectedCategory: String = "", // selected category name
     var cardColors: List<Color> = List(9) { colors.NotQuiteWhite },
     var imageTints: List<Color> = List(9) { colors.GreenBlue },
     var textColor: List<Color> = List(9) { colors.GreenBlue }
@@ -25,10 +27,3 @@ data class MainViewState (
         textColor = textColor.toMutableList().also { it[index] = newColorText }
     }
 }
-=======
-data class MainViewState (
-    var isUserLoggedIn: Boolean = false,
-    var categories: List<String> = listOf(), // List of category names
-    var selectedCategory: String = "" // selected category name
-)
->>>>>>> firebase_copy
