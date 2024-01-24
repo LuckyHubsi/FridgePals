@@ -14,6 +14,7 @@ data class MainViewState (
     val openEditUser: Boolean = false,
 
     val userId: String = "",
+    var currentItemToEdit: FridgeItem? = null,
 
     val communityFridgeItems: List<FridgeItem> = listOf(),
     val ownFridgeItemsNotReserved: List<FridgeItem> = listOf(),

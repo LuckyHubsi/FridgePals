@@ -102,6 +102,9 @@ fun MainView(
                             onFailure = {
                             })
                     },
+                    onEditItem = {
+                        item -> mainViewModel.mainViewState.value.currentItemToEdit = item
+                    }
                 )
             }
             composable(Screen.Second.route) {

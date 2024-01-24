@@ -150,7 +150,7 @@ fun RoundedCard(
 }
 
 @Composable
-fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) -> Unit, item: FridgeItem, /*onEdit: (FridgeItem) -> Unit*/) {
+fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) -> Unit, item: FridgeItem, onEdit: (FridgeItem) -> Unit) {
     // Second row: Edit and Remove buttons
     Button(
         onClick = {
@@ -178,7 +178,7 @@ fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) 
 
     Button(
         onClick = {
-            //onEdit(item)
+            onEdit(item)
             mainViewModel.openDialogEdit()
         },
         modifier = Modifier
@@ -249,7 +249,7 @@ fun ButtonContentReservedItems(item: FridgeItem, reservations: Reservations, onC
     }
 }
 
-/*@SuppressLint("StateFlowValueCalledInComposition")
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PopUp_Edit(
@@ -412,7 +412,7 @@ fun PopUp_Edit(
                 }
             }
         )
-}*/
+}
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)

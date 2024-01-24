@@ -34,19 +34,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
-@SuppressLint("SuspiciousIndentation")
+@SuppressLint("SuspiciousIndentation", "StateFlowValueCalledInComposition")
 @Composable
 fun OwnFridge(
     mainViewModel: MainViewModel,
     navController: NavController,
     userId: String,
     onDeleteItem: (FridgeItem) -> Unit,
-/*    item: FridgeItem,
-    onConfirm: (FridgeItem) -> Unit,
-    onEditItem: (FridgeItem) -> Unit*/
+    onEditItem: (FridgeItem) -> Unit
 ) {
     var username by remember { mutableStateOf("Loading...") }
 
@@ -135,7 +134,7 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, /*onEditItem*/) },
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
             }
@@ -169,7 +168,7 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index,/* onEditItem*/) },
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
             }
@@ -181,14 +180,34 @@ fun OwnFridge(
             userId
         )
     }
-/*    Column() {
+    Column() {
         PopUp_Edit(
             mainViewModel,
             userId,
-*//*            item,
-            onConfirm*//*
+            item = mainViewModel.mainViewState.value.currentItemToEdit!!,
+            onConfirm = {
+                    updatedItem ->
+                FridgeRepository.editFridgeItem(userId,
+                    mainViewModel.mainViewState.value.currentItemToEdit!!.itemId,
+                    updatedItem,
+                    onSuccess = {
+                        FridgeRepository.getFridgeItemsNotReserved(
+                            userId,
+                            onSuccess = { items ->
+                                fridgeItems = items
+                            },
+                            onFailure = {  })
+                        mainViewModel.mainViewState.value.currentItemToEdit = null
+                    },
+                    onFailure = { error ->
+                        // Handle error
+                        mainViewModel.mainViewState.value.currentItemToEdit = null
+                    }
+                )
+            }
+
         )
-    }*/
+    }
     Column() {
         EditUserPopup(mainViewModel)
     }
