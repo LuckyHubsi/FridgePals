@@ -71,6 +71,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
+import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.repository.FridgeRepository.addItemToFridge
 import com.example.fridgepals.ui.view_model.MainViewModel
 
@@ -149,10 +150,12 @@ fun RoundedCard(
 }
 
 @Composable
-fun ButtonContentOwnFridge(mainViewModel: MainViewModel) {
+fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) -> Unit, item: FridgeItem, /*onEdit: (FridgeItem) -> Unit*/) {
     // Second row: Edit and Remove buttons
     Button(
-        onClick = { },
+        onClick = {
+            onDelete(item)
+        },
         modifier = Modifier
             .width(135.dp)
             .height(60.dp)
@@ -174,7 +177,10 @@ fun ButtonContentOwnFridge(mainViewModel: MainViewModel) {
     }
 
     Button(
-        onClick = { mainViewModel.openDialog() },
+        onClick = {
+            //onEdit(item)
+            mainViewModel.openDialogEdit()
+        },
         modifier = Modifier
             .width(135.dp)
             .height(60.dp)
@@ -196,9 +202,9 @@ fun ButtonContentOwnFridge(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun ButtonContentCommunityFridge() {
+fun ButtonContentCommunityFridge(item: FridgeItem, onReserve: (String, String) -> Unit) {
     Button(
-        onClick = { },
+        onClick = { onReserve(item.ownerId, item.itemId) },
         modifier = Modifier
             .width(250.dp)
             .height(60.dp)
@@ -220,9 +226,9 @@ fun ButtonContentCommunityFridge() {
 }
 
 @Composable
-fun ButtonContentReservedItems() {
+fun ButtonContentReservedItems(item: FridgeItem, reservations: Reservations, onCancel: (String) -> Unit) {
     Button(
-        onClick = { },
+        onClick = { onCancel(reservations.reservationId) },
         modifier = Modifier
             .width(265.dp)
             .height(60.dp)
@@ -242,6 +248,171 @@ fun ButtonContentReservedItems() {
         )
     }
 }
+
+/*@SuppressLint("StateFlowValueCalledInComposition")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PopUp_Edit(
+    mainViewModel: MainViewModel,
+    userId: String,
+    item: FridgeItem,
+    onConfirm: (FridgeItem) -> Unit
+) {
+    val state = mainViewModel.mainViewState.collectAsState()
+
+    var name by remember {
+        mutableStateOf((item.name))
+    }
+    var quantity by remember {
+        mutableStateOf((item.quantity))
+    }
+
+    var selectedCategory by remember { mutableStateOf(item.category) }
+
+    var pickup_date by remember {
+        mutableStateOf((item.pickupDay))
+    }
+    var pickup_time by remember {
+        mutableStateOf((item.pickupTime))
+    }
+
+
+    if (state.value.openDialogEdit)
+        AlertDialog(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            onDismissRequest = { mainViewModel.dismissDialogEdit() },
+            confirmButton = {},
+            text = {
+                Column(
+                ) {
+                    // Name
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { newText -> name = newText },
+                        label = { androidx.compose.material.Text("Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    // Quantity
+                    OutlinedTextField(
+                        value = quantity,
+                        onValueChange = { newText -> quantity = newText },
+                        label = { androidx.compose.material.Text("Quantity") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    CategoryDropdownMenu(mainViewModel.mainViewState.value.listOfCategories, selectedCategory, onCategorySelected = {
+                            category -> selectedCategory = category
+                    })
+
+                    // Pickup Date
+                    OutlinedTextField(
+                        value = pickup_date,
+                        onValueChange = { newText -> pickup_date = newText },
+                        label = { androidx.compose.material.Text("Pick-up date") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                        colors = getOutlinedTextFieldColors()
+                    )
+
+                    // Pickup Time
+                    OutlinedTextField(
+                        value = pickup_time,
+                        onValueChange = { newText -> pickup_time = newText },
+                        label = { androidx.compose.material.Text("Pick-up time") },
+                        trailingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Face,
+                                contentDescription = null
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        colors = getOutlinedTextFieldColors()
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 25.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = { mainViewModel.dismissDialogEdit() },
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(60.dp)
+                                .padding(top = 5.dp)
+                                .shadow(
+                                    5.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                                )
+                                .clip(RoundedCornerShape(20.dp)),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                            shape = RectangleShape,
+                        ) {
+                            androidx.compose.material.Text(
+                                "Cancel",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 20.sp
+                            )
+                        }
+
+                        Button(
+                            modifier = Modifier
+                                .width(125.dp)
+                                .height(60.dp)
+                                .padding(top = 5.dp)
+                                .shadow(
+                                    5.dp,
+                                    shape = RoundedCornerShape(20.dp),
+                                    ambientColor = MaterialTheme.colorScheme.onSecondary
+                                )
+                                .clip(RoundedCornerShape(20.dp)),
+                            shape = RectangleShape,
+                            onClick = {
+                                mainViewModel.dismissDialogEdit()
+                                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                                mainViewModel.refreshOwnFridgeItemsReserved(userId)
+                                val updatedItem = item.copy(
+                                    name = name,
+                                    quantity = quantity,
+                                    category = selectedCategory,
+                                    pickupDay = pickup_date,
+                                    pickupTime = pickup_time
+                                )
+                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
+                                    onConfirm(updatedItem)
+                                }
+                            },
+                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
+                        ) {
+                            androidx.compose.material.Text(
+                                text = "Confirm",
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontSize = 20.sp
+                            )
+                        }
+                    }
+                }
+            }
+        )
+}*/
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -547,7 +718,7 @@ fun ProfileDropdownMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary)
         ) {
-            DropdownMenuItem(
+            /*DropdownMenuItem(
                 text = { Text("Edit Profile") },
                 onClick = { mainViewModel.openEditUser() },
                 leadingIcon = {
@@ -555,7 +726,7 @@ fun ProfileDropdownMenu(
                         Icons.Outlined.Edit,
                         contentDescription = null
                     )
-                })
+                })*/
             DropdownMenuItem(
                 text = { Text("Logout") },
                 onClick = {

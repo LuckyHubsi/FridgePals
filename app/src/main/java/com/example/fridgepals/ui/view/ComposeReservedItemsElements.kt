@@ -27,7 +27,7 @@ import androidx.compose.foundation.lazy.items
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ReservedItems(mainViewModel: MainViewModel) {
+fun ReservedItems(mainViewModel: MainViewModel, onCancel: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,7 +59,7 @@ fun ReservedItems(mainViewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp),
-                buttonContent = { ButtonContentReservedItems() },
+                buttonContent = { ButtonContentReservedItems(index, it, onCancel) },
                 item = index
             ) }
         }

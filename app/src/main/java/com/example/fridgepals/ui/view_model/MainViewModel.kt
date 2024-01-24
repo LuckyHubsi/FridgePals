@@ -33,6 +33,14 @@ class MainViewModel() : ViewModel() {
         _mainViewState.update { it.copy(openDialog = true) }
     }
 
+    fun dismissDialogEdit() {
+        _mainViewState.update { it.copy(openDialogEdit = false) }
+    }
+
+    fun openDialogEdit() {
+        _mainViewState.update { it.copy(openDialogEdit = true) }
+    }
+
     fun dismissEditUser() {
         _mainViewState.update { it.copy(openEditUser = false) }
     }

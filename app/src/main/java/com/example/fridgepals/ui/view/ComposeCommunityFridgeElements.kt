@@ -28,7 +28,7 @@ import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 @Composable
-fun CommunityFridge(mainViewModel: MainViewModel) {
+fun CommunityFridge(mainViewModel: MainViewModel, onReserve: (String, String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -83,7 +83,7 @@ fun CommunityFridge(mainViewModel: MainViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp),
-                buttonContent = { ButtonContentCommunityFridge() },
+                buttonContent = { ButtonContentCommunityFridge(index, onReserve) },
                 item = index
             )
         }

@@ -10,6 +10,7 @@ data class MainViewState (
     val selectedScreen: Screen = Screen.Login,
     val isUserLoggedIn: Boolean = false,
     val openDialog: Boolean = false,
+    val openDialogEdit: Boolean = false,
     val openEditUser: Boolean = false,
 
     val userId: String = "",

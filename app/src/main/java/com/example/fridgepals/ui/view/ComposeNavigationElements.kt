@@ -30,6 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
+import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
@@ -84,19 +85,52 @@ fun MainView(
                 OwnFridge(
                     mainViewModel,
                     navController,
-                    userId
+                    userId,
+                    onDeleteItem = { item ->
+                        FridgeRepository.deleteFridgeItem(
+                            userId,
+                            item.itemId,
+                            onSuccess = {
+                                FridgeRepository.getFridgeItemsNotReserved(
+                                    userId,
+                                    onSuccess = {
+                                        mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                                        mainViewModel.refreshOwnFridgeItemsReserved(userId)
+                                                },
+                                    onFailure = {  })
+                            },
+                            onFailure = {
+                            })
+                    },
                 )
-                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
-                mainViewModel.refreshOwnFridgeItemsReserved(userId)
             }
             composable(Screen.Second.route) {
                 mainViewModel.selectScreen(Screen.Second)
-                CommunityFridge(mainViewModel)
+                CommunityFridge(mainViewModel, onReserve = { offeringUserId, itemId ->
+                    val reservingUserId = userId
+                    FridgeRepository.reserveItem(
+                        reservingUserId,
+                        offeringUserId,
+                        itemId,
+                        {
+                            mainViewModel.refreshCommunityItems(userId)
+                            mainViewModel.refreshReservedItems(userId)
+                        },
+                        {})})
                 mainViewModel.refreshCommunityItems(userId)
+                mainViewModel.refreshReservedItems(userId)
             }
             composable(Screen.Third.route) {
                 mainViewModel.selectScreen(Screen.Third)
-                ReservedItems(mainViewModel)
+                ReservedItems(
+                    mainViewModel,
+                            onCancel = { reservationId ->
+                        FridgeRepository.deleteReservation(userId, reservationId, onSuccess = {
+                            mainViewModel.refreshReservedItems(userId)
+                            mainViewModel.refreshReservationsList(userId)
+                        }, onFailure = {})
+                    }
+                )
                 mainViewModel.refreshReservedItems(userId)
                 mainViewModel.refreshReservationsList(userId)
             }

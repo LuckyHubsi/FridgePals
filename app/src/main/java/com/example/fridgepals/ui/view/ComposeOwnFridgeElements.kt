@@ -19,7 +19,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,7 +42,11 @@ import com.example.fridgepals.ui.view_model.MainViewModel
 fun OwnFridge(
     mainViewModel: MainViewModel,
     navController: NavController,
-    userId: String
+    userId: String,
+    onDeleteItem: (FridgeItem) -> Unit,
+/*    item: FridgeItem,
+    onConfirm: (FridgeItem) -> Unit,
+    onEditItem: (FridgeItem) -> Unit*/
 ) {
     var username by remember { mutableStateOf("Loading...") }
 
@@ -132,7 +135,7 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel) },
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, /*onEditItem*/) },
                     item = index
                 )
             }
@@ -166,7 +169,7 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel) },
+                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index,/* onEditItem*/) },
                     item = index
                 )
             }
@@ -178,6 +181,14 @@ fun OwnFridge(
             userId
         )
     }
+/*    Column() {
+        PopUp_Edit(
+            mainViewModel,
+            userId,
+*//*            item,
+            onConfirm*//*
+        )
+    }*/
     Column() {
         EditUserPopup(mainViewModel)
     }
