@@ -46,57 +46,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.fridgepals.data.model.Address
+import com.example.fridgepals.data.model.User
 import com.example.fridgepals.ui.view_model.MainViewModel
-
-/*
-@Composable
-fun LoginForm(onLoginComplete: (String, String) -> Unit, message: String) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    Column {
-
-        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") })
-
-        Button(onClick = { onLoginComplete(email, password) }) {
-            Text("Login")
-        }
-        if (message.isNotEmpty()) {
-            Text(message)
-        }
-    }
-}
-
-----------------------------------------------------------------------------------------
-
-LoginForm(onLoginComplete = { email, password ->
-                                UserRepository.loginUser(email, password,
-                                    onSuccess = {
-                                        loginMessage = "You are logged in!"
-                                    },
-                                    onFailure = { errorMessage ->
-                                        loginMessage = "Login failed: $errorMessage"
-                                    }
-                                )
-                            }, loginMessage)
-
- */
-
 
 
 
 @Composable
 fun Login(mainViewModel: MainViewModel, onLoginComplete: (String, String) -> Unit) {
-/*    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var password by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }*/
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -190,22 +147,13 @@ fun Login(mainViewModel: MainViewModel, onLoginComplete: (String, String) -> Uni
 
 
 @Composable
-fun Register(mainViewModel: MainViewModel) {
-    var name by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var city by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var street by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var password by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
+fun Register(mainViewModel: MainViewModel, onRegistrationComplete: (String, String, User) -> Unit) {
+
+    var name by remember { mutableStateOf("") }
+    var city by remember { mutableStateOf("") }
+    var street by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     val focusManager = LocalFocusManager.current
 
@@ -305,11 +253,19 @@ fun Register(mainViewModel: MainViewModel) {
 
                 // Register Button
                 Button(
-                    onClick = { mainViewModel.updateAuth(true) },
                     modifier = Modifier.fillMaxWidth()
                         .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
                         .height(58.dp)
                     ,
+                    onClick = {
+                        if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && city.isNotEmpty() && street.isNotEmpty()) {
+                            val userAddress = Address(city, street)
+                            val user = User(name, email, userAddress, fridge = emptyMap())
+                            onRegistrationComplete(email, password, user)
+                        }
+                    },
+                    enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && city.isNotEmpty() && street.isNotEmpty()
+
                 ) {
                     Text("Register", color = MaterialTheme.colorScheme.onPrimary, fontSize = 22.sp)
                 }

@@ -1,5 +1,6 @@
 package com.example.fridgepals.ui.view
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +25,9 @@ import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.view_model.MainViewModel
 import androidx.compose.foundation.lazy.items
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
-fun ReservedItems(mainViewModel: MainViewModel, reservedItems: List<FridgeItem>, reservationsList: List<Reservations>) {
+fun ReservedItems(mainViewModel: MainViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -50,8 +52,8 @@ fun ReservedItems(mainViewModel: MainViewModel, reservedItems: List<FridgeItem>,
     ) {
 
 
-        items(reservedItems) { index ->
-            val reservation = reservationsList.find {it.itemId == index.itemId}
+        items(mainViewModel.mainViewState.value.reservedItems) { index ->
+            val reservation = mainViewModel.mainViewState.value.reservationsList.find {it.itemId == index.itemId}
             reservation?.let {
                 RoundedCard(
                 modifier = Modifier

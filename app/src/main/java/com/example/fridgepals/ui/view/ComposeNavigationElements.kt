@@ -13,6 +13,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,18 +34,42 @@ import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 
-sealed class Screen(val route: String){
-    object First: Screen("first")
-    object Second: Screen("second")
-    object Third: Screen("third")
-    object Login: Screen("login")
-    object Register: Screen("register")
+sealed class Screen(val route: String) {
+    object First : Screen("first")
+    object Second : Screen("second")
+    object Third : Screen("third")
+    object Login : Screen("login")
+    object Register : Screen("register")
 }
 
 @Composable
-fun MainView(mainViewModel: MainViewModel, communityFridgeItems: List<FridgeItem>, ownFridgeItemsNotReserved: List<FridgeItem>, ownFridgeItemsReserved: List<FridgeItem>, reservedItems: List<FridgeItem>, reservationsList: List<Reservations>){
+fun MainView(
+    mainViewModel: MainViewModel,
+    userId: String
+) {
     val state = mainViewModel.mainViewState.collectAsState()
     val navController = rememberNavController()
+
+    LaunchedEffect(userId) {
+        mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+    }
+    LaunchedEffect(userId) {
+        mainViewModel.refreshOwnFridgeItemsReserved(userId)
+    }
+    LaunchedEffect(userId) {
+        mainViewModel.refreshCommunityItems(userId)
+    }
+    LaunchedEffect(userId) {
+        mainViewModel.refreshReservedItems(userId)
+    }
+    LaunchedEffect(userId) {
+        mainViewModel.refreshReservationsList(userId)
+    }
+    LaunchedEffect(userId) {
+        mainViewModel.refreshListOfCategories(userId)
+    }
+
+
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController, state.value.selectedScreen) }
@@ -54,20 +78,29 @@ fun MainView(mainViewModel: MainViewModel, communityFridgeItems: List<FridgeItem
             navController = navController,
             modifier = Modifier.padding(it),
             startDestination = Screen.First.route
-        ){
-            composable(Screen.First.route){
+        ) {
+            composable(Screen.First.route) {
                 mainViewModel.selectScreen(Screen.First)
-                OwnFridge(mainViewModel, navController, ownFridgeItemsNotReserved, ownFridgeItemsReserved)
+                OwnFridge(
+                    mainViewModel,
+                    navController,
+                    userId
+                )
+                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                mainViewModel.refreshOwnFridgeItemsReserved(userId)
             }
-            composable(Screen.Second.route){
+            composable(Screen.Second.route) {
                 mainViewModel.selectScreen(Screen.Second)
-                CommunityFridge(mainViewModel, communityFridgeItems)
+                CommunityFridge(mainViewModel)
+                mainViewModel.refreshCommunityItems(userId)
             }
-            composable(Screen.Third.route){
+            composable(Screen.Third.route) {
                 mainViewModel.selectScreen(Screen.Third)
-                ReservedItems(mainViewModel, reservedItems, reservationsList)
+                ReservedItems(mainViewModel)
+                mainViewModel.refreshReservedItems(userId)
+                mainViewModel.refreshReservationsList(userId)
             }
-            composable(Screen.Login.route){
+            composable(Screen.Login.route) {
                 mainViewModel.selectScreen(Screen.Login)
                 Login(mainViewModel, onLoginComplete = { email, password ->
                     UserRepository.loginUser(email, password,
@@ -78,9 +111,15 @@ fun MainView(mainViewModel: MainViewModel, communityFridgeItems: List<FridgeItem
                     )
                 })
             }
-            composable(Screen.Register.route){
+            composable(Screen.Register.route) {
                 mainViewModel.selectScreen(Screen.Register)
-                Register(mainViewModel)
+                Register(mainViewModel,onRegistrationComplete = { email, password, user ->
+                    UserRepository.registerUser(email, password, user,
+                        onSuccess = {
+                        },
+                        onFailure = {
+                        })
+                })
             }
         }
     }

@@ -1,16 +1,15 @@
 package com.example.fridgepals.ui.view
 
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,14 +19,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -39,49 +34,35 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material.icons.outlined.ExitToApp
-import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -90,9 +71,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
-import com.example.fridgepals.repository.UserRepository
+import com.example.fridgepals.repository.FridgeRepository.addItemToFridge
 import com.example.fridgepals.ui.view_model.MainViewModel
-import java.util.Calendar
 
 @Composable
 fun RoundedCard(
@@ -263,27 +243,30 @@ fun ButtonContentReservedItems() {
     }
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeItem: (FridgeItem) -> Unit, pickupDay: String, onPickupDayChange: (String) -> Unit*/) {
+fun PopUp(
+    mainViewModel: MainViewModel,
+    userId: String
+) {
     val state = mainViewModel.mainViewState.collectAsState()
 
-    var name by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
+    var name by remember {
+        mutableStateOf((""))
     }
-    var quantity by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var category by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var pickup_date by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var pickup_time by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
+    var quantity by remember {
+        mutableStateOf((""))
     }
 
+    var pickup_date by remember {
+        mutableStateOf((""))
+    }
+    var pickup_time by remember {
+        mutableStateOf((""))
+    }
+
+    var selectedCategory by remember { mutableStateOf("") }
 
     if (state.value.openDialog)
         AlertDialog(
@@ -315,16 +298,9 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    // Category
-                    OutlinedTextField(
-                        value = category,
-                        onValueChange = { newText -> category = newText },
-                        label = { androidx.compose.material.Text("Category") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
+                    CategoryDropdownMenu(mainViewModel.mainViewState.value.listOfCategories, selectedCategory, onCategorySelected = {
+                        category -> selectedCategory = category
+                    })
 
                     // Pickup Date
                     OutlinedTextField(
@@ -343,7 +319,7 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                         keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
                         colors = getOutlinedTextFieldColors()
                     )
-                    
+
                     // Pickup Time
                     OutlinedTextField(
                         value = pickup_time,
@@ -363,8 +339,7 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = 25.dp)
-                        ,
+                            .padding(top = 25.dp),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
@@ -378,8 +353,7 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                                     shape = RoundedCornerShape(20.dp),
                                     ambientColor = MaterialTheme.colorScheme.onSecondary
                                 )
-                                .clip(RoundedCornerShape(20.dp))
-                            ,
+                                .clip(RoundedCornerShape(20.dp)),
                             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
                             shape = RectangleShape,
                         ) {
@@ -390,9 +364,7 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                             )
                         }
 
-
                         Button(
-                            onClick = { mainViewModel.dismissDialog() },
                             modifier = Modifier
                                 .width(125.dp)
                                 .height(60.dp)
@@ -403,7 +375,22 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                                     ambientColor = MaterialTheme.colorScheme.onSecondary
                                 )
                                 .clip(RoundedCornerShape(20.dp)),
-                            shape = RectangleShape
+                            shape = RectangleShape,
+                            onClick = {
+                                mainViewModel.dismissDialog()
+                                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                                val fridgeItem = FridgeItem(
+                                    name = name,
+                                    quantity = quantity,
+                                    category = selectedCategory,
+                                    pickupDay = pickup_date,
+                                    pickupTime = pickup_time
+                                )
+                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
+                                    mainViewModel.addItemToFridge(userId, fridgeItem)
+                                }
+                            },
+                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
                         ) {
                             androidx.compose.material.Text(
                                 text = "Confirm",
@@ -413,12 +400,38 @@ fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeIte
                         }
                     }
                 }
-
-
-
-
             }
-            )
+        )
+}
+
+@Composable
+fun CategoryDropdownMenu(
+    categories: List<String>,
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Text(
+        text = selectedCategory,
+        modifier = Modifier.clickable { expanded = true }
+    )
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = { expanded = false }
+    ) {
+        categories.forEach { name ->
+            DropdownMenuItem(text = {
+                Text(text = name)
+            },
+                onClick = {
+                    onCategorySelected(name)
+                    expanded = false
+                })
+        }
+    }
+    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
 }
 
 data class ListModel(
@@ -453,10 +466,9 @@ fun CustomListView(mainViewModel: MainViewModel) {
 
                 modifier = Modifier
                     .padding(8.dp)
-                    .width(110.dp)
-                ,
+                    .width(110.dp),
 
-                border = BorderStroke(1.dp,MaterialTheme.colorScheme.onPrimary),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
 
                 backgroundColor = state.value.cardColors[index],
 
@@ -508,7 +520,11 @@ fun CustomListView(mainViewModel: MainViewModel) {
 }
 
 @Composable
-fun ProfileDropdownMenu(mainViewModel: MainViewModel, onLogout: () -> Unit, navController: NavController) {
+fun ProfileDropdownMenu(
+    mainViewModel: MainViewModel,
+    onLogout: () -> Unit,
+    userId: String
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box(
@@ -546,7 +562,8 @@ fun ProfileDropdownMenu(mainViewModel: MainViewModel, onLogout: () -> Unit, navC
                     onLogout()
                     mainViewModel.updateAuth(false)
                     mainViewModel.selectScreen(Screen.Login)
-                          },
+
+                },
                 leadingIcon = {
                     Icon(
                         Icons.Outlined.ExitToApp,
@@ -593,7 +610,9 @@ fun LocationDropdownMenu() {
                 .offset(x = (-100).dp, y = 60.dp)
         ) {
             DropdownMenu(
-                modifier = Modifier.width(200.dp).heightIn(max = 300.dp),
+                modifier = Modifier
+                    .width(200.dp)
+                    .heightIn(max = 300.dp),
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
@@ -611,7 +630,6 @@ fun LocationDropdownMenu() {
         }
     }
 }
-
 
 
 @Composable
@@ -635,7 +653,7 @@ fun EditUserPopup(mainViewModel: MainViewModel) {
 
     if (state.value.openEditUser)
         AlertDialog(
-            modifier = Modifier.clickable{ focusManager.clearFocus() },
+            modifier = Modifier.clickable { focusManager.clearFocus() },
             containerColor = MaterialTheme.colorScheme.secondary,
             onDismissRequest = { mainViewModel.dismissEditUser() },
             confirmButton = {},

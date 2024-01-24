@@ -28,7 +28,7 @@ import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 @Composable
-fun CommunityFridge(mainViewModel: MainViewModel, fridgeItems: List<FridgeItem>) {
+fun CommunityFridge(mainViewModel: MainViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -78,7 +78,7 @@ fun CommunityFridge(mainViewModel: MainViewModel, fridgeItems: List<FridgeItem>)
     ) {
 
 
-        items(fridgeItems) { index ->
+        items(mainViewModel.mainViewState.value.communityFridgeItems) { index ->
             RoundedCard(
                 modifier = Modifier
                     .fillMaxWidth()

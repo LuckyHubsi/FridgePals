@@ -12,6 +12,8 @@ import com.google.firebase.database.ValueEventListener
 
 object UserRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private var userId: String? = null
+
     fun registerUser(email: String, password: String, user: User, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->

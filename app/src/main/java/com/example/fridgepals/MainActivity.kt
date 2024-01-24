@@ -8,121 +8,89 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.fridgepals.data.model.FridgeItem
-import com.example.fridgepals.data.model.Reservations
-import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
-import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Login
+import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Register
 import com.example.fridgepals.ui.view.Screen
 import com.example.fridgepals.ui.view_model.MainViewModel
-import com.example.fridgepals.ui.view_model.MainViewState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
-    private val mainViewState by mutableStateOf(MainViewState())
-    private var currentItemToEdit by mutableStateOf<FridgeItem?>(null)
+    private val mainViewModel = MainViewModel()
+    private var userId: String = ""
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
-
-        val mainViewModel = MainViewModel()
-        var userId: String = ""
-
         super.onCreate(savedInstanceState)
         auth = Firebase.auth
 
 
         setContent {
+            // TODO: Viewstate sollte nur in den relevanten screens geholt werden. Viewmodel wird dorthin weitergegeben
+            val mainViewState by mainViewModel.mainViewState.collectAsState()
             val currentUser = auth.currentUser
             userId = currentUser?.uid.toString()
-            var communityFridgeItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-            var ownFridgeItemsNotReserved by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-            var ownFridgeItemsReserved by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-            var reservedItems by remember { mutableStateOf<List<FridgeItem>>(listOf()) }
-            var reservationsList by remember { mutableStateOf<List<Reservations>>(listOf()) }
 
-            FridgeRepository.getFridgeItemsNotReserved(userId,
-            onSuccess = { items ->
-                ownFridgeItemsNotReserved = items
-            },
-            onFailure = { /* Handle failure */ }
-            )
 
-            FridgeRepository.getFridgeItemsReserved(userId,
-                onSuccess = { items ->
-                    ownFridgeItemsReserved = items
-                },
-                onFailure = { /* Handle failure */ }
-            )
+            // TODO: Datenbank interaktion sollten nur auf den relevanten screens passieren
+            // TODO: Einen sinnvollen launched-effekt finden (Interaktion nur beim esrsten render, oder wenn sich was bestimtmes ändert, ...)
 
-            FridgeRepository.getCommunityFridge(
-                currentUserId = userId,
-                onSuccess = { items ->
-                    communityFridgeItems = items
-                },
-                onFailure = { /* Handle failure */ }
-            )
-
-            FridgeRepository.getReservedItems(userId,
-                onSuccess = { items ->
-                    reservedItems = items
-                },
-                onFailure = { /* Handle failure */ }
-            )
-
-            FridgeRepository.getReservations(userId,
-                onSuccess = {   reservations ->
-                    reservationsList = reservations
-                },
-                onFailure = { /* Handle Failure */})
 
             FridgePalsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val state = mainViewModel.mainViewState.collectAsState()
-
-                    if (auth.currentUser != null && !state.value.isUserLoggedIn) {
+                    if (auth.currentUser != null && !mainViewState.isUserLoggedIn) {
                         mainViewModel.updateAuth(true)
                     }
 
-                    when (state.value.isUserLoggedIn) {
-                        true -> MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
-                        false -> when (state.value.selectedScreen) {
-                            Screen.Login -> Login(mainViewModel, onLoginComplete = { email, password ->
-                                UserRepository.loginUser(email, password,
-                                    onSuccess = {
-                                        mainViewModel.updateAuth(true)
-                                    },
-                                    onFailure = {
-                                    }
-                                )
-                            })
-                            Screen.Register -> Register(mainViewModel)
+                    when (mainViewState.isUserLoggedIn) {
+                        true -> MainView(
+                            mainViewModel,
+                            userId,
+                        )
+
+                        false -> when (mainViewState.selectedScreen) {
+                            Screen.Login -> Login(
+                                mainViewModel,
+                                onLoginComplete = { email, password ->
+                                    UserRepository.loginUser(email, password,
+                                        onSuccess = {
+                                            mainViewModel.updateAuth(true)
+                                        },
+                                        onFailure = {
+                                        }
+                                    )
+                                })
+
+                            Screen.Register -> Register(
+                                mainViewModel,
+                                onRegistrationComplete = { email, password, user ->
+                                    UserRepository.registerUser(email, password, user,
+                                        onSuccess = {
+                                            mainViewModel.updateAuth(true)
+                                        },
+                                        onFailure = {
+                                        })
+                                }
+                            )
+
                             else -> {}
                         }
-                        else -> {}
+
                     }
-            }
                 }
             }
         }
     }
+}
 /*
                     // Check if user is logged in and update state
                     mainViewState.isUserLoggedIn = auth.currentUser != null
