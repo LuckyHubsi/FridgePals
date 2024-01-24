@@ -265,7 +265,7 @@ fun ButtonContentReservedItems() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PopUp(mainViewModel: MainViewModel) {
+fun PopUp(mainViewModel: MainViewModel/*, categories: List<String>, addFridgeItem: (FridgeItem) -> Unit, pickupDay: String, onPickupDayChange: (String) -> Unit*/) {
     val state = mainViewModel.mainViewState.collectAsState()
 
     var name by rememberSaveable(stateSaver = TextFieldValue.Saver) {
@@ -284,8 +284,6 @@ fun PopUp(mainViewModel: MainViewModel) {
         mutableStateOf(TextFieldValue(""))
     }
 
-    val selectedDate = remember { mutableStateOf(Calendar.getInstance()) }
-    val isDatePickerVisible = remember { mutableStateOf(false) }
 
     if (state.value.openDialog)
         AlertDialog(
@@ -547,6 +545,7 @@ fun ProfileDropdownMenu(mainViewModel: MainViewModel, onLogout: () -> Unit, navC
                 onClick = {
                     onLogout()
                     navController.navigate(Screen.Login.route)
+                    //mainViewModel.selectScreen(Screen.Login)
                           },
                 leadingIcon = {
                     Icon(

@@ -12,6 +12,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.repository.FridgeRepository
@@ -26,6 +28,9 @@ import com.example.fridgepals.ui.view_model.MainViewState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var auth: FirebaseAuth
@@ -91,6 +96,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val state = mainViewModel.mainViewState.collectAsState()
+                    // remember
 
 
                     if (auth.currentUser != null) {
@@ -101,13 +107,14 @@ class MainActivity : ComponentActivity() {
                     Screen.Login -> Login(mainViewModel, onLoginComplete = { email, password ->
                         UserRepository.loginUser(email, password,
                             onSuccess = {
+                                mainViewModel.selectScreen(Screen.First)
                             },
                             onFailure = {
-
                             }
                         )
                     })
                     Screen.Register -> Register(mainViewModel)
+                    //Screen.First -> MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
                     else -> {}
                 }
             }
