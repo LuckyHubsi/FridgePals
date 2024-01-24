@@ -15,8 +15,8 @@ class MainViewModel(): ViewModel() {
         _mainViewState.update { it.copy(selectedScreen = screen) }
     }
 
-    fun updateAuth() {
-        _mainViewState.update { it.copy(isUserLoggedIn = true) }
+    fun updateAuth(state: Boolean) {
+        _mainViewState.update { it.copy(isUserLoggedIn = state) }
     }
 
     fun toggleColors(index: Int) {

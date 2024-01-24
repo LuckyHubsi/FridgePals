@@ -305,7 +305,7 @@ fun Register(mainViewModel: MainViewModel) {
 
                 // Register Button
                 Button(
-                    onClick = { mainViewModel.updateAuth() },
+                    onClick = { mainViewModel.updateAuth(true) },
                     modifier = Modifier.fillMaxWidth()
                         .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
                         .height(58.dp)

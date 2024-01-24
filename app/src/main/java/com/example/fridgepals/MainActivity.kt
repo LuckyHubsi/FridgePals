@@ -96,27 +96,28 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val state = mainViewModel.mainViewState.collectAsState()
-                    // remember
 
+                    if (auth.currentUser != null && !state.value.isUserLoggedIn) {
+                        mainViewModel.updateAuth(true)
+                    }
 
-                    if (auth.currentUser != null) {
-                        MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
-                    } else
-                // Display the appropriate screen based on selectedScreen
-                when (state.value.selectedScreen) {
-                    Screen.Login -> Login(mainViewModel, onLoginComplete = { email, password ->
-                        UserRepository.loginUser(email, password,
-                            onSuccess = {
-                                mainViewModel.selectScreen(Screen.First)
-                            },
-                            onFailure = {
-                            }
-                        )
-                    })
-                    Screen.Register -> Register(mainViewModel)
-                    //Screen.First -> MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
-                    else -> {}
-                }
+                    when (state.value.isUserLoggedIn) {
+                        true -> MainView(mainViewModel, communityFridgeItems, ownFridgeItemsNotReserved, ownFridgeItemsReserved, reservedItems, reservationsList)
+                        false -> when (state.value.selectedScreen) {
+                            Screen.Login -> Login(mainViewModel, onLoginComplete = { email, password ->
+                                UserRepository.loginUser(email, password,
+                                    onSuccess = {
+                                        mainViewModel.updateAuth(true)
+                                    },
+                                    onFailure = {
+                                    }
+                                )
+                            })
+                            Screen.Register -> Register(mainViewModel)
+                            else -> {}
+                        }
+                        else -> {}
+                    }
             }
                 }
             }

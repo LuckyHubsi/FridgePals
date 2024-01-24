@@ -544,8 +544,8 @@ fun ProfileDropdownMenu(mainViewModel: MainViewModel, onLogout: () -> Unit, navC
                 text = { Text("Logout") },
                 onClick = {
                     onLogout()
-                    navController.navigate(Screen.Login.route)
-                    //mainViewModel.selectScreen(Screen.Login)
+                    mainViewModel.updateAuth(false)
+                    mainViewModel.selectScreen(Screen.Login)
                           },
                 leadingIcon = {
                     Icon(
