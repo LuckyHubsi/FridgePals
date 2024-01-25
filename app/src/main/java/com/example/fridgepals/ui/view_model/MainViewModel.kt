@@ -2,6 +2,7 @@ package com.example.fridgepals.ui.view_model
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
+import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.ui.view.Screen
@@ -131,5 +132,7 @@ class MainViewModel() : ViewModel() {
     fun stopEditingFridgeItem() {
         setCurrentItemToEdit(null)
     }
+
+
 }
 

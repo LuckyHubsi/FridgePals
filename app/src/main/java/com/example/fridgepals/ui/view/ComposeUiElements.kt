@@ -67,12 +67,29 @@ import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 @Composable
+fun getCategoryIcon(category: String): Int {
+    return when (category) {
+        "Vegetables" -> R.drawable.category_vegetables
+        "Fruits" -> R.drawable.category_fruits
+        "Meat" -> R.drawable.category_meat
+        "Dairy" -> R.drawable.category_dairy
+        "Grains" -> R.drawable.category_grains
+        "Leftovers" -> R.drawable.category_leftovers
+        "Seafood" -> R.drawable.category_seafood
+        "Sweets" -> R.drawable.category_sweets
+        "Beverages" -> R.drawable.category_beverages
+        else -> R.drawable.ic_launcher // Provide a default icon or handle unknown categories
+    }
+}
+
+@Composable
 fun RoundedCard(
     modifier: Modifier = Modifier,
     imageModifier: Modifier = Modifier,
     onEditClick: () -> Unit = {},
     onRemoveClick: () -> Unit = {},
     buttonContent: @Composable () -> Unit,
+    category: String,
     item: FridgeItem
 ) {
     Box(
@@ -96,7 +113,7 @@ fun RoundedCard(
         ) {
             // Image
             Icon(
-                imageVector = Icons.Default.Email,
+                painter = painterResource(id = getCategoryIcon(category)),
                 contentDescription = null,
                 modifier = imageModifier
                     .size(85.dp)

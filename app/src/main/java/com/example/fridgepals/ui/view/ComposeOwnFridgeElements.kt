@@ -146,6 +146,7 @@ fun OwnFridge(
                             onEdit = onEditItem
                         )
                     },
+                    category = index.category,
                     item = index
                 )
 
@@ -190,6 +191,7 @@ fun OwnFridge(
                             onEdit = onEditItem
                         )
                     },
+                    category = index.category,
                     item = index
                 )
             }

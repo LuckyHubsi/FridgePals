@@ -60,7 +60,8 @@ fun ReservedItems(mainViewModel: MainViewModel, onCancel: (String) -> Unit) {
                     .fillMaxWidth()
                     .padding(start = 10.dp, end = 10.dp),
                 buttonContent = { ButtonContentReservedItems(index, it, onCancel) },
-                item = index
+                    category = index.category,
+                    item = index
             ) }
         }
     }

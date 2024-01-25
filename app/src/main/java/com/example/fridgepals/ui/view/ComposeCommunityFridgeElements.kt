@@ -86,6 +86,7 @@ fun CommunityFridge(mainViewModel: MainViewModel, onReserve: (String, String) ->
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
                     buttonContent = { ButtonContentCommunityFridge(index, onReserve) },
+                    category = index.category,
                     item = index
                 )
             }
