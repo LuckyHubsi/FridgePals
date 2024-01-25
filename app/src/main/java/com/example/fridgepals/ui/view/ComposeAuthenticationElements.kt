@@ -121,7 +121,10 @@ fun Login(mainViewModel: MainViewModel, onLoginComplete: (String, String) -> Uni
                 )
 
                 Button(
-                    onClick = { onLoginComplete(email, password) },
+                    onClick = {
+                        if (email.isNotEmpty() && password.isNotEmpty())
+                            onLoginComplete(email, password)
+                              },
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(5.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.onSecondary)
