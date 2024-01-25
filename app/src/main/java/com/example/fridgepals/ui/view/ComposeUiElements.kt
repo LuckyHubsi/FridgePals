@@ -118,8 +118,9 @@ fun RoundedCard(
                 modifier = imageModifier
                     .size(85.dp)
                     .clip(RoundedCornerShape(16.dp))
-                    .background(Color.Gray)
                     .padding(8.dp)
+                ,
+                tint = MaterialTheme.colorScheme.primary
             )
 
             // TextBlock
