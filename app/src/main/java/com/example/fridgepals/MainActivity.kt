@@ -16,48 +16,33 @@ import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Register
 import com.example.fridgepals.ui.view.Screen
 import com.example.fridgepals.ui.view_model.MainViewModel
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 
 class MainActivity : ComponentActivity() {
-    private lateinit var auth: FirebaseAuth
     private val mainViewModel = MainViewModel()
-    private var userId: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        auth = Firebase.auth
 
 
         setContent {
             val mainViewState by mainViewModel.mainViewState.collectAsState()
-            val currentUser = auth.currentUser
-            userId = currentUser?.uid.toString()
+            val userId = mainViewState.userId
 
             FridgePalsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    if (auth.currentUser != null && !mainViewState.isUserLoggedIn) {
-                        mainViewModel.updateAuth(true)
-                    }
 
-                    when (mainViewState.isUserLoggedIn) {
-                        true -> MainView(
-                            mainViewModel,
-                            userId,
-                        )
-
-                        false -> when (mainViewState.selectedScreen) {
+                    when (userId) {
+                        null -> when (mainViewState.selectedScreen) {
                             Screen.Login -> Login(
                                 mainViewModel,
                                 onLoginComplete = { email, password ->
                                     UserRepository.loginUser(email, password,
-                                        onSuccess = {
-                                            mainViewModel.updateAuth(true)
+                                        onSuccess = { loggedInUserId ->
+                                            mainViewModel.setLoggedInUserId(loggedInUserId)
                                         },
                                         onFailure = {
                                         }
@@ -68,8 +53,8 @@ class MainActivity : ComponentActivity() {
                                 mainViewModel,
                                 onRegistrationComplete = { email, password, user ->
                                     UserRepository.registerUser(email, password, user,
-                                        onSuccess = {
-                                            mainViewModel.updateAuth(true)
+                                        onSuccess = { registeredUserId ->
+                                            mainViewModel.setLoggedInUserId(registeredUserId)
                                         },
                                         onFailure = {
                                         })
@@ -78,6 +63,11 @@ class MainActivity : ComponentActivity() {
 
                             else -> {}
                         }
+
+                        else -> MainView(
+                            mainViewModel,
+                            userId,
+                        )
 
                     }
                 }

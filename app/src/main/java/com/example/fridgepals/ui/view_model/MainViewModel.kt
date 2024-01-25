@@ -1,6 +1,5 @@
 package com.example.fridgepals.ui.view_model
 
-import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.fridgepals.data.model.FridgeItem
@@ -10,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+
 class MainViewModel() : ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
@@ -19,12 +19,12 @@ class MainViewModel() : ViewModel() {
         _mainViewState.update { it.copy(selectedScreen = screen) }
     }
 
-    fun updateAuth(state: Boolean) {
-        _mainViewState.update { it.copy(isUserLoggedIn = state) }
-    }
-
     fun toggleColors(index: Int) {
         _mainViewState.update { it.copy().also { state -> state.toggleColors(index) } }
+    }
+
+    fun setLoggedInUserId(userId: String?) {
+        _mainViewState.update { it.copy(userId = userId) }
     }
 
     fun dismissDialog() {
@@ -91,8 +91,8 @@ class MainViewModel() : ViewModel() {
 
     fun addItemToFridge(userId: String, fridgeItem: FridgeItem) {
         FridgeRepository.addItemToFridge(userId, fridgeItem,
-            onSuccess = {  },
-            onFailure = {  }
+            onSuccess = { },
+            onFailure = { }
         )
     }
 
@@ -113,7 +113,7 @@ class MainViewModel() : ViewModel() {
     }
 
     fun setCurrentItemToEdit(item: FridgeItem?) {
-        _mainViewState.update {currentState ->
+        _mainViewState.update { currentState ->
             currentState.copy(currentItemToEdit = item)
         }
     }

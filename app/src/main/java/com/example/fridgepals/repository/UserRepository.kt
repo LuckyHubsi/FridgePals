@@ -13,7 +13,7 @@ import com.google.firebase.database.ValueEventListener
 object UserRepository {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    fun registerUser(email: String, password: String, user: User, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun registerUser(email: String, password: String, user: User, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -25,7 +25,7 @@ object UserRepository {
                     if (userId != null) {
                         FirebaseManager.database.reference.child("users").child(userId).setValue(user)
                             .addOnSuccessListener {
-                                onSuccess()
+                                onSuccess(userId)
                             }
                             .addOnFailureListener { e ->
                                 onFailure(e.message ?: "Failed to save user data")
@@ -40,12 +40,12 @@ object UserRepository {
             }
     }
 
-    fun loginUser(email: String, password: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+    fun loginUser(email: String, password: String, onSuccess: (String) -> Unit, onFailure: (String) -> Unit) {
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     // Login success
-                    onSuccess()
+                    onSuccess(task.result.user!!.uid)
                 } else {
                     // Login failure
                     onFailure(task.exception?.message ?: "Authentication failed.")

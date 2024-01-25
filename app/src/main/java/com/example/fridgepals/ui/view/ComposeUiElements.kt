@@ -33,10 +33,6 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -52,7 +48,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,19 +55,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
-import com.example.fridgepals.repository.FridgeRepository.addItemToFridge
 import com.example.fridgepals.ui.view_model.MainViewModel
 
 @Composable
@@ -150,7 +141,12 @@ fun RoundedCard(
 }
 
 @Composable
-fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) -> Unit, item: FridgeItem, onEdit: (FridgeItem) -> Unit) {
+fun ButtonContentOwnFridge(
+    mainViewModel: MainViewModel,
+    onDelete: (FridgeItem) -> Unit,
+    item: FridgeItem,
+    onEdit: (FridgeItem) -> Unit
+) {
     // Second row: Edit and Remove buttons
     Button(
         onClick = {
@@ -226,7 +222,11 @@ fun ButtonContentCommunityFridge(item: FridgeItem, onReserve: (String, String) -
 }
 
 @Composable
-fun ButtonContentReservedItems(item: FridgeItem, reservations: Reservations, onCancel: (String) -> Unit) {
+fun ButtonContentReservedItems(
+    item: FridgeItem,
+    reservations: Reservations,
+    onCancel: (String) -> Unit
+) {
     Button(
         onClick = { onCancel(reservations.reservationId) },
         modifier = Modifier
@@ -306,9 +306,12 @@ fun PopUp_Edit(
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    CategoryDropdownMenu(mainViewModel.mainViewState.value.listOfCategories, selectedCategory, onCategorySelected = {
-                            category -> selectedCategory = category
-                    })
+                    CategoryDropdownMenu(
+                        mainViewModel.mainViewState.value.listOfCategories,
+                        selectedCategory,
+                        onCategorySelected = { category ->
+                            selectedCategory = category
+                        })
 
                     // Pickup Date
                     OutlinedTextField(
@@ -351,7 +354,9 @@ fun PopUp_Edit(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
-                            onClick = { mainViewModel.mainViewState.value.currentItemToEdit = null },
+                            onClick = {
+                                mainViewModel.mainViewState.value.currentItemToEdit = null
+                            },
                             modifier = Modifier
                                 .width(125.dp)
                                 .height(60.dp)
@@ -468,9 +473,12 @@ fun PopUp(
                         colors = getOutlinedTextFieldColors()
                     )
 
-                    CategoryDropdownMenu(mainViewModel.mainViewState.value.listOfCategories, selectedCategory, onCategorySelected = {
-                        category -> selectedCategory = category
-                    })
+                    CategoryDropdownMenu(
+                        mainViewModel.mainViewState.value.listOfCategories,
+                        selectedCategory,
+                        onCategorySelected = { category ->
+                            selectedCategory = category
+                        })
 
                     // Pickup Date
                     OutlinedTextField(
@@ -707,7 +715,7 @@ fun ProfileDropdownMenu(
                 text = { Text("Logout") },
                 onClick = {
                     onLogout()
-                    mainViewModel.updateAuth(false)
+                    mainViewModel.setLoggedInUserId(null)
                     mainViewModel.selectScreen(Screen.Login)
 
                 },
