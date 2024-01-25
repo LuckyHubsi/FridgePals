@@ -119,7 +119,6 @@ class MainViewModel() : ViewModel() {
         }
     }
 
-
     // Function to toggle a filter
     fun toggleFilter(filter: String) {
         if (selectedFilters.contains(filter)) {
@@ -133,6 +132,10 @@ class MainViewModel() : ViewModel() {
         setCurrentItemToEdit(null)
     }
 
-
+    fun setPickupDay(newPickupDay: String) {
+        _mainViewState.update { currentState ->
+            currentState.copy(pickupDay = newPickupDay)
+        }
+    }
 }
 

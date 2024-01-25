@@ -207,6 +207,7 @@ fun OwnFridge(
                 item = mainViewModel.mainViewState.value.currentItemToEdit!!,
             )
     }
+
     if (mainViewModel.mainViewState.value.openDialog)
         Column() {
             PopUp(
