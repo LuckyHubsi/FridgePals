@@ -368,12 +368,12 @@ fun PopUp_Edit(
                         value = pickup_time,
                         onValueChange = { newText -> pickup_time = newText },
                         label = { androidx.compose.material.Text("Pick-up time") },
-                        trailingIcon = {
+/*                        trailingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Face,
                                 contentDescription = null
                             )
-                        },
+                        },*/
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
@@ -539,12 +539,12 @@ fun PopUp(
                     value = pickup_time,
                     onValueChange = { newText -> pickup_time = newText },
                     label = { androidx.compose.material.Text("Pick-up time") },
-                    trailingIcon = {
+/*                    trailingIcon = {
                         Icon(
                             imageVector = Icons.Default.Face,
                             contentDescription = null
                         )
-                    },
+                    },*/
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
