@@ -427,8 +427,6 @@ fun PopUp(
     mainViewModel: MainViewModel,
     userId: String
 ) {
-    val state = mainViewModel.mainViewState.collectAsState()
-
     var name by remember {
         mutableStateOf((""))
     }
@@ -445,7 +443,8 @@ fun PopUp(
 
     var selectedCategory by remember { mutableStateOf("") }
 
-    if (!state.value.openDialog) return
+
+
     AlertDialog(
         containerColor = MaterialTheme.colorScheme.secondary,
         onDismissRequest = { mainViewModel.dismissDialog() },

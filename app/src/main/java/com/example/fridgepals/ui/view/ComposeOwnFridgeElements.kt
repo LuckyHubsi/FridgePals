@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
 import com.example.fridgepals.data.model.FridgeItem
-import com.example.fridgepals.repository.FridgeRepository
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.view_model.MainViewModel
 
@@ -54,6 +52,8 @@ fun OwnFridge(
         username = name
     }
 
+
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -71,12 +71,12 @@ fun OwnFridge(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(top = 10.dp, start = 10.dp, end = 10.dp)
-                ,
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
             ) {
-                Text("Hi, $username!", style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.width(275.dp)
+                Text(
+                    "Hi, $username!", style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.width(275.dp)
                 )
                 ProfileDropdownMenu(mainViewModel, { UserRepository.logoutUser() }, userId)
             }
@@ -138,16 +138,20 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
+                    buttonContent = {
+                        ButtonContentOwnFridge(
+                            mainViewModel,
+                            onDelete = onDeleteItem,
+                            index,
+                            onEdit = onEditItem
+                        )
+                    },
                     item = index
                 )
-                if (mainViewModel.mainViewState.value.currentItemToEdit != null)
-                PopUp_Edit(
-                    mainViewModel,
-                    userId,
-                    item = mainViewModel.mainViewState.value.currentItemToEdit!!,
-                )
+
             }
+
+
 
             item {
                 Box(
@@ -178,23 +182,32 @@ fun OwnFridge(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
+                    buttonContent = {
+                        ButtonContentOwnFridge(
+                            mainViewModel,
+                            onDelete = onDeleteItem,
+                            index,
+                            onEdit = onEditItem
+                        )
+                    },
                     item = index
-                )
-                if (mainViewModel.mainViewState.value.currentItemToEdit != null)
-                PopUp_Edit(
-                    mainViewModel,
-                    userId,
-                    item = mainViewModel.mainViewState.value.currentItemToEdit!!,
                 )
             }
         }
+
+        if (mainViewModel.mainViewState.value.currentItemToEdit != null)
+            PopUp_Edit(
+                mainViewModel,
+                userId,
+                item = mainViewModel.mainViewState.value.currentItemToEdit!!,
+            )
     }
-    Column() {
-        PopUp(
-            mainViewModel,
-            userId
-        )
-    }
+    if (mainViewModel.mainViewState.value.openDialog)
+        Column() {
+            PopUp(
+                mainViewModel,
+                userId
+            )
+        }
 }
 
