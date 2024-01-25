@@ -127,5 +127,9 @@ class MainViewModel() : ViewModel() {
             selectedFilters.add(filter)
         }
     }
+
+    fun stopEditingFridgeItem() {
+        setCurrentItemToEdit(null)
+    }
 }
 

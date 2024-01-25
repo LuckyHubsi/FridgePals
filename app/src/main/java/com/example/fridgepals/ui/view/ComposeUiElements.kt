@@ -355,7 +355,7 @@ fun PopUp_Edit(
                     ) {
                         Button(
                             onClick = {
-                                mainViewModel.mainViewState.value.currentItemToEdit = null
+                                mainViewModel.stopEditingFridgeItem()
                             },
                             modifier = Modifier
                                 .width(125.dp)
