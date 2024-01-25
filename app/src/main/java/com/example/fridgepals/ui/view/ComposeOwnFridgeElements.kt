@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.fridgepals.R
@@ -76,7 +77,9 @@ fun OwnFridge(
             ) {
                 Text(
                     "Hi, $username!", style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.width(275.dp)
+                    modifier = Modifier.width(275.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 ProfileDropdownMenu(mainViewModel, { UserRepository.logoutUser() }, userId)
             }

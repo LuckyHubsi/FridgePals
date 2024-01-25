@@ -59,6 +59,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fridgepals.R
@@ -132,14 +133,20 @@ fun RoundedCard(
                 androidx.compose.material3.Text(
                     "${item.quantity} ${item.name}",
                     style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 androidx.compose.material3.Text(
                     "${item.category}",
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 androidx.compose.material3.Text(
                     "${item.pickupDay}, ${item.pickupTime}",
                     style = MaterialTheme.typography.bodyMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
         }
@@ -186,14 +193,13 @@ fun ButtonContentOwnFridge(
         androidx.compose.material.Text(
             "Remove",
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 22.sp
+            fontSize = 20.sp
         )
     }
 
     Button(
         onClick = {
             onEdit(item)
-            //mainViewModel.openDialogEdit()
         },
         modifier = Modifier
             .width(135.dp)
@@ -210,7 +216,7 @@ fun ButtonContentOwnFridge(
         androidx.compose.material.Text(
             "Edit",
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 22.sp
+            fontSize = 20.sp
         )
     }
 }
@@ -234,7 +240,7 @@ fun ButtonContentCommunityFridge(item: FridgeItem, onReserve: (String, String) -
         androidx.compose.material.Text(
             "Reserve",
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 22.sp
+            fontSize = 20.sp
         )
     }
 }
@@ -262,7 +268,7 @@ fun ButtonContentReservedItems(
         androidx.compose.material.Text(
             "Cancel Reservation",
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 22.sp
+            fontSize = 20.sp
         )
     }
 }
