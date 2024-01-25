@@ -2,6 +2,7 @@ package com.example.fridgepals.ui.view
 
 
 import android.annotation.SuppressLint
+import android.app.DatePickerDialog
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,6 +61,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -74,6 +76,7 @@ import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.repository.FridgeRepository.addItemToFridge
 import com.example.fridgepals.ui.view_model.MainViewModel
+import java.util.Calendar
 
 @Composable
 fun RoundedCard(
@@ -418,9 +421,13 @@ fun PopUp_Edit(
 @Composable
 fun PopUp(
     mainViewModel: MainViewModel,
-    userId: String
+    userId: String,
+    //pickupDay: String,
+    //onPickupDayChange: (String) -> Unit,
 ) {
     val state = mainViewModel.mainViewState.collectAsState()
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
     var name by remember {
         mutableStateOf((""))
@@ -429,7 +436,7 @@ fun PopUp(
         mutableStateOf((""))
     }
 
-    var pickup_date by remember {
+    var newPickUpDay by remember {
         mutableStateOf((""))
     }
     var pickup_time by remember {
@@ -473,22 +480,24 @@ fun PopUp(
                     })
 
                     // Pickup Date
-                    OutlinedTextField(
-                        value = pickup_date,
-                        onValueChange = { newText -> pickup_date = newText },
-                        label = { androidx.compose.material.Text("Pick-up date") },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = null
-                            )
-                        },
+                    Button(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                        colors = getOutlinedTextFieldColors()
-                    )
+                        onClick = {
+                        val datePickerDialog = DatePickerDialog(
+                            context,
+                            { _, year, month, dayOfMonth ->
+                                mainViewModel.setPickupDay("$dayOfMonth.${month + 1}.$year")
+                            },
+                            calendar.get(Calendar.YEAR),
+                            calendar.get(Calendar.MONTH),
+                            calendar.get(Calendar.DAY_OF_MONTH)
+                        )
+                        datePickerDialog.show()
+                    }) {
+                        Text(if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day")
+                    }
 
                     // Pickup Time
                     OutlinedTextField(
@@ -549,18 +558,19 @@ fun PopUp(
                             onClick = {
                                 mainViewModel.dismissDialog()
                                 mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                                mainViewModel.setPickupDay("")
                                 val fridgeItem = FridgeItem(
                                     name = name,
                                     quantity = quantity,
                                     category = selectedCategory,
-                                    pickupDay = pickup_date,
+                                    pickupDay = state.value.pickupDay,
                                     pickupTime = pickup_time
                                 )
-                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
+                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && state.value.pickupDay.isNotEmpty() && pickup_time.isNotEmpty()) {
                                     mainViewModel.addItemToFridge(userId, fridgeItem)
                                 }
                             },
-                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
+                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && state.value.pickupDay.isNotEmpty() && pickup_time.isNotEmpty()
                         ) {
                             androidx.compose.material.Text(
                                 text = "Confirm",

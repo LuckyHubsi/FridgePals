@@ -131,5 +131,11 @@ class MainViewModel() : ViewModel() {
             currentState.copy(currentItemToEdit = item)
         }
     }
+
+    fun setPickupDay(newPickupDay: String) {
+        _mainViewState.update { currentState ->
+            currentState.copy(pickupDay = newPickupDay)
+        }
+    }
 }
 

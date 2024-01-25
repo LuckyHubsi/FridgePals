@@ -189,7 +189,7 @@ fun OwnFridge(
     Column() {
         PopUp(
             mainViewModel,
-            userId
+            userId,
         )
     }
     Column() {
