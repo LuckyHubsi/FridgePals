@@ -102,8 +102,8 @@ fun MainView(
                             onFailure = {
                             })
                     },
-                    onEditItem = {
-                        item -> mainViewModel.mainViewState.value.currentItemToEdit = item
+                    onEditItem = {item ->
+                        mainViewModel.setCurrentItemToEdit(item)
                     },
                 )
             }

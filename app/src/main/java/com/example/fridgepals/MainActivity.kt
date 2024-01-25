@@ -32,15 +32,9 @@ class MainActivity : ComponentActivity() {
 
 
         setContent {
-            // TODO: Viewstate sollte nur in den relevanten screens geholt werden. Viewmodel wird dorthin weitergegeben
             val mainViewState by mainViewModel.mainViewState.collectAsState()
             val currentUser = auth.currentUser
             userId = currentUser?.uid.toString()
-
-
-            // TODO: Datenbank interaktion sollten nur auf den relevanten screens passieren
-            // TODO: Einen sinnvollen launched-effekt finden (Interaktion nur beim esrsten render, oder wenn sich was bestimtmes ändert, ...)
-
 
             FridgePalsTheme {
                 Surface(

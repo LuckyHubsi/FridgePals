@@ -137,10 +137,11 @@ fun OwnFridge(
                     buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
+                if (mainViewModel.mainViewState.value.currentItemToEdit != null)
                 PopUp_Edit(
                     mainViewModel,
                     userId,
-                    index,
+                    item = mainViewModel.mainViewState.value.currentItemToEdit!!,
                 )
             }
 
@@ -176,10 +177,11 @@ fun OwnFridge(
                     buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
+                if (mainViewModel.mainViewState.value.currentItemToEdit != null)
                 PopUp_Edit(
                     mainViewModel,
                     userId,
-                    index,
+                    item = mainViewModel.mainViewState.value.currentItemToEdit!!,
                 )
             }
         }

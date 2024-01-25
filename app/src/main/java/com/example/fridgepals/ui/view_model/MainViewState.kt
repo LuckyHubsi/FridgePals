@@ -36,7 +36,6 @@ data class MainViewState (
         val newColorImage = if (imageTints[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
         val newColorText = if (textColor[index] == colors.NotQuiteWhite) colors.GreenBlue else colors.NotQuiteWhite
 
-        // TODO: Anstatt state in place zu manipulieren, einen neuen state mit den änderungen machen (.copy) und returnen
         cardColors = cardColors.toMutableList().also { it[index] = newColorCard }
         imageTints = imageTints.toMutableList().also { it[index] = newColorImage }
         textColor = textColor.toMutableList().also { it[index] = newColorText }

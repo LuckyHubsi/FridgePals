@@ -1,5 +1,6 @@
 package com.example.fridgepals.ui.view_model
 
+import androidx.compose.runtime.currentComposer
 import androidx.lifecycle.ViewModel
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.repository.FridgeRepository
@@ -122,7 +123,13 @@ class MainViewModel() : ViewModel() {
                 // Handle the failure case
             }
         )
+        setCurrentItemToEdit(null)
     }
 
+    fun setCurrentItemToEdit(item: FridgeItem?) {
+        _mainViewState.update {currentState ->
+            currentState.copy(currentItemToEdit = item)
+        }
+    }
 }
 

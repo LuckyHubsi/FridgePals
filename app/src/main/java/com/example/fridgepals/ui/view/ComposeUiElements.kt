@@ -179,7 +179,7 @@ fun ButtonContentOwnFridge(mainViewModel: MainViewModel, onDelete: (FridgeItem) 
     Button(
         onClick = {
             onEdit(item)
-            mainViewModel.openDialogEdit()
+            //mainViewModel.openDialogEdit()
         },
         modifier = Modifier
             .width(135.dp)
@@ -276,10 +276,10 @@ fun PopUp_Edit(
     }
 
 
-    if (state.value.openDialogEdit)
+    if (state.value.currentItemToEdit != null)
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.secondary,
-            onDismissRequest = { mainViewModel.dismissDialogEdit() },
+            onDismissRequest = { mainViewModel.mainViewState.value.currentItemToEdit = null },
             confirmButton = {},
             text = {
                 Column(
@@ -351,7 +351,7 @@ fun PopUp_Edit(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Button(
-                            onClick = { mainViewModel.dismissDialogEdit() },
+                            onClick = { mainViewModel.mainViewState.value.currentItemToEdit = null },
                             modifier = Modifier
                                 .width(125.dp)
                                 .height(60.dp)
@@ -385,7 +385,7 @@ fun PopUp_Edit(
                                 .clip(RoundedCornerShape(20.dp)),
                             shape = RectangleShape,
                             onClick = {
-                                mainViewModel.dismissDialogEdit()
+                                mainViewModel.mainViewState.value.currentItemToEdit = null
                                 mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
                                 mainViewModel.refreshOwnFridgeItemsReserved(userId)
                                 val updatedItem = item.copy(
