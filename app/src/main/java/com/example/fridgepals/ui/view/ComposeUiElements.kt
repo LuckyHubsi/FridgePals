@@ -347,7 +347,8 @@ fun PopUp_Edit(
                     Button(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 8.dp),
+                            .padding(bottom = 8.dp)
+                            .background(MaterialTheme.colorScheme.primary),
                         onClick = {
                             val datePickerDialog = DatePickerDialog(
                                 context,
@@ -360,7 +361,10 @@ fun PopUp_Edit(
                             )
                             datePickerDialog.show()
                         }) {
-                        Text(if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day")
+                        Text(
+                            text = if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day",
+                            color = Color.White // Set text color to match the outlinedTextField
+                        )
                     }
 
                     // Pickup Time
@@ -416,7 +420,7 @@ fun PopUp_Edit(
                                 .padding(top = 5.dp)
                                 .shadow(
                                     5.dp,
-                                    shape = RoundedCornerShape(20.dp),
+                                    shape = RoundedCornerShape(28.dp),
                                     ambientColor = MaterialTheme.colorScheme.onSecondary
                                 )
                                 .clip(RoundedCornerShape(20.dp)),
@@ -507,19 +511,22 @@ fun PopUp(
                     colors = getOutlinedTextFieldColors()
                 )
 
+                // Category DropdownMenu
                 CategoryDropdownMenu(
-                    mainViewModel.mainViewState.value.listOfCategories,
-                    selectedCategory,
+                    categories = mainViewModel.mainViewState.value.listOfCategories,
+                    selectedCategory = selectedCategory,
                     onCategorySelected = { category ->
                         selectedCategory = category
-                    })
+                    },
+                )
 
-                    // Pickup Date
-                    Button(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        onClick = {
+                // Pickup Date
+                Button(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .background(MaterialTheme.colorScheme.primary),
+                    onClick = {
                         val datePickerDialog = DatePickerDialog(
                             context,
                             { _, year, month, dayOfMonth ->
@@ -531,20 +538,18 @@ fun PopUp(
                         )
                         datePickerDialog.show()
                     }) {
-                        Text(if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day")
-                    }
+                    Text(
+                        text = if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day",
+                        color = Color.White // Set text color to match the outlinedTextField
+                    )
+                }
+
 
                 // Pickup Time
                 OutlinedTextField(
                     value = pickup_time,
                     onValueChange = { newText -> pickup_time = newText },
                     label = { androidx.compose.material.Text("Pick-up time") },
-/*                    trailingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Face,
-                            contentDescription = null
-                        )
-                    },*/
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp),
@@ -585,7 +590,7 @@ fun PopUp(
                             .padding(top = 5.dp)
                             .shadow(
                                 5.dp,
-                                shape = RoundedCornerShape(20.dp),
+                                shape = RoundedCornerShape(28.dp),
                                 ambientColor = MaterialTheme.colorScheme.onSecondary
 
                             )
@@ -627,27 +632,64 @@ fun CategoryDropdownMenu(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Text(
-        text = selectedCategory,
-        modifier = Modifier.clickable { expanded = true }
-    )
-
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false }
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp)
+            .padding(bottom = 8.dp)
+            .background(MaterialTheme.colorScheme.primary),
     ) {
-        categories.forEach { name ->
-            DropdownMenuItem(text = {
-                Text(text = name)
-            },
-                onClick = {
-                    onCategorySelected(name)
-                    expanded = false
-                })
+        // Display placeholder or selected category
+        val displayText = if (selectedCategory.isNotEmpty()) selectedCategory else "Select a category"
+
+        Text(
+            text = displayText,
+            modifier = Modifier.clickable { expanded = true }
+                .padding(8.dp) // Add padding to center the text vertically
+                .align(Alignment.CenterStart) // Align the text vertically in the center
+            ,
+            color = MaterialTheme.colorScheme.onPrimary
+
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            // Add a placeholder item
+            if (selectedCategory.isNotEmpty()) {
+                DropdownMenuItem(
+                    text = {},
+                    onClick = {
+                        onCategorySelected("")
+                        expanded = false
+                    }
+                )
+            }
+
+            // Display categories
+            categories.forEach { name ->
+                DropdownMenuItem(
+                    text = {
+                        Text(text = name)
+                    },
+                    onClick = {
+                        onCategorySelected(name)
+                        expanded = false
+                    }
+                )
+            }
         }
-    }
-    Icon(Icons.Default.ArrowDropDown, contentDescription = null)
+        Icon(
+            Icons.Default.ArrowDropDown,
+            tint = MaterialTheme.colorScheme.onPrimary,
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.CenterEnd) // Align the icon to the right-center
+                .clickable { expanded = true }
+        )    }
 }
+
 
 data class ListModel(
     val categoryName: String,
@@ -769,6 +811,7 @@ fun ProfileDropdownMenu(
 @Composable
 fun LocationDropdownMenu() {
     var expanded by remember { mutableStateOf(false) }
+    var selectedCity by remember { mutableStateOf("St. Pölten") }
 
     Box(
         modifier = Modifier
@@ -782,7 +825,7 @@ fun LocationDropdownMenu() {
         ) {
             TextButton(onClick = { expanded = true }) {
                 Text(
-                    "St. Pölten",
+                    selectedCity,
                     style = MaterialTheme.typography.titleLarge,
                     fontSize = 36.sp,
                     textDecoration = TextDecoration.Underline
@@ -808,15 +851,16 @@ fun LocationDropdownMenu() {
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    repeat(10) { index -> // Adjust the number of items for testing
-                        DropdownMenuItem(
-                            text = { Text("Location $index") },
-                            onClick = { /* Handle click */ },
-                        )
-                    }
+                val cities = listOf("St. Pölten", "Vienna", "Graz", "Linz", "Salzburg", "Innsbruck", "Klagenfurt", "Eisenstadt")
+
+                cities.forEach { city ->
+                    DropdownMenuItem(
+                        text = { Text(city) },
+                        onClick = {
+                            selectedCity = city
+                            expanded = false
+                        }
+                    )
                 }
             }
         }

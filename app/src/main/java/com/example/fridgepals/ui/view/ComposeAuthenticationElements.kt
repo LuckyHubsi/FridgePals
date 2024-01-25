@@ -1,5 +1,7 @@
 package com.example.fridgepals.ui.view
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -39,6 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -160,6 +163,8 @@ fun Register(mainViewModel: MainViewModel, onRegistrationComplete: (String, Stri
 
     val focusManager = LocalFocusManager.current
 
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -261,6 +266,18 @@ fun Register(mainViewModel: MainViewModel, onRegistrationComplete: (String, Stri
                         .height(58.dp)
                     ,
                     onClick = {
+                        if (password.length < 6) {
+                            showToast(context, "Password must be at least 6 characters long.")
+                            return@Button
+                        }
+
+                        // Validate email
+                        if (!isValidEmail(email)) {
+                            showToast(context, "Invalid email format.")
+                            return@Button
+                        }
+
+                        // Register the user if all validations pass
                         if (name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && city.isNotEmpty() && street.isNotEmpty()) {
                             val userAddress = Address(city, street)
                             val user = User(name, email, userAddress, fridge = emptyMap())
@@ -285,6 +302,17 @@ fun Register(mainViewModel: MainViewModel, onRegistrationComplete: (String, Stri
                 }
         )
     }
+}
+
+// Helper function to show a Toast message
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+}
+
+// Helper function to validate email format
+fun isValidEmail(email: String): Boolean {
+    val emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\$"
+    return email.matches(emailRegex.toRegex())
 }
 
 @Composable
