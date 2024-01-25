@@ -279,7 +279,9 @@ fun PopUp_Edit(
     if (state.value.currentItemToEdit != null)
         AlertDialog(
             containerColor = MaterialTheme.colorScheme.secondary,
-            onDismissRequest = { mainViewModel.mainViewState.value.currentItemToEdit = null },
+            onDismissRequest = {
+                mainViewModel.stopEditingFridgeItem()
+            },
             confirmButton = {},
             text = {
                 Column(
