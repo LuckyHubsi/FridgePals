@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -70,10 +71,13 @@ fun OwnFridge(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(top = 10.dp, start = 10.dp, end = 10.dp),
-                horizontalArrangement = Arrangement.spacedBy(100.dp, Alignment.CenterHorizontally),
+                    .padding(top = 10.dp, start = 10.dp, end = 10.dp)
+                ,
+                horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.CenterHorizontally),
             ) {
-                Text("Hi, $username!", style = MaterialTheme.typography.titleLarge)
+                Text("Hi, $username!", style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.width(275.dp)
+                )
                 ProfileDropdownMenu(mainViewModel, { UserRepository.logoutUser() }, userId)
             }
             Row(
@@ -191,9 +195,6 @@ fun OwnFridge(
             mainViewModel,
             userId
         )
-    }
-    Column() {
-        EditUserPopup(mainViewModel)
     }
 }
 

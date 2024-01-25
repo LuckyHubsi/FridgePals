@@ -1,6 +1,7 @@
 package com.example.fridgepals.ui.view_model
 
 import androidx.compose.runtime.currentComposer
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.repository.FridgeRepository
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.update
 class MainViewModel() : ViewModel() {
     private val _mainViewState = MutableStateFlow(MainViewState())
     val mainViewState: StateFlow<MainViewState> = _mainViewState.asStateFlow()
+    val selectedFilters = mutableStateListOf<String>()
 
     fun selectScreen(screen: Screen) {
         _mainViewState.update { it.copy(selectedScreen = screen) }
@@ -31,22 +33,6 @@ class MainViewModel() : ViewModel() {
 
     fun openDialog() {
         _mainViewState.update { it.copy(openDialog = true) }
-    }
-
-    fun dismissDialogEdit() {
-        _mainViewState.update { it.copy(openDialogEdit = false) }
-    }
-
-    fun openDialogEdit() {
-        _mainViewState.update { it.copy(openDialogEdit = true) }
-    }
-
-    fun dismissEditUser() {
-        _mainViewState.update { it.copy(openEditUser = false) }
-    }
-
-    fun openEditUser() {
-        _mainViewState.update { it.copy(openEditUser = true) }
     }
 
     fun refreshOwnFridgeItemsNotReserved(userId: String) {
@@ -129,6 +115,16 @@ class MainViewModel() : ViewModel() {
     fun setCurrentItemToEdit(item: FridgeItem?) {
         _mainViewState.update {currentState ->
             currentState.copy(currentItemToEdit = item)
+        }
+    }
+
+
+    // Function to toggle a filter
+    fun toggleFilter(filter: String) {
+        if (selectedFilters.contains(filter)) {
+            selectedFilters.remove(filter)
+        } else {
+            selectedFilters.add(filter)
         }
     }
 }

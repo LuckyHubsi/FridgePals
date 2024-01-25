@@ -76,16 +76,19 @@ fun CommunityFridge(mainViewModel: MainViewModel, onReserve: (String, String) ->
         modifier = Modifier
             .padding(top = 250.dp)
     ) {
-
-
         items(mainViewModel.mainViewState.value.communityFridgeItems) { index ->
-            RoundedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 10.dp, end = 10.dp),
-                buttonContent = { ButtonContentCommunityFridge(index, onReserve) },
-                item = index
-            )
+            // Check if the item's category matches any selected filter
+            if (mainViewModel.selectedFilters.isEmpty() ||
+                mainViewModel.selectedFilters.contains(index.category)
+            ) {
+                RoundedCard(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 10.dp, end = 10.dp),
+                    buttonContent = { ButtonContentCommunityFridge(index, onReserve) },
+                    item = index
+                )
+            }
         }
     }
 }

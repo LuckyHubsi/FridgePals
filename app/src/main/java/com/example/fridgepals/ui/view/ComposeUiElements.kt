@@ -631,56 +631,42 @@ fun CustomListView(mainViewModel: MainViewModel) {
         itemsIndexed(courseList) { index, item ->
             Card(
                 onClick = {
+                    mainViewModel.toggleFilter(courseList[index].categoryName)
                     mainViewModel.toggleColors(index)
                 },
-
                 modifier = Modifier
                     .padding(8.dp)
                     .width(110.dp),
-
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.onPrimary),
-
                 backgroundColor = state.value.cardColors[index],
-
                 elevation = 6.dp
-            )
-            {
+            ) {
                 Column(
                     modifier = Modifier
                         .padding(8.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Icon(
                         painter = painterResource(id = courseList[index].categoryImg),
-
                         contentDescription = "img",
-
                         modifier = Modifier
                             .height(75.dp)
                             .width(75.dp)
                             .padding(1.dp),
-
                         tint = state.value.imageTints[index]
                     )
 
                     Spacer(modifier = Modifier.height(5.dp))
 
                     Text(
-
                         text = courseList[index].categoryName,
-
                         fontSize = MaterialTheme.typography.bodySmall.fontSize,
-
                         fontFamily = MaterialTheme.typography.bodySmall.fontFamily,
-
                         modifier = Modifier.padding(4.dp),
-
                         color = state.value.textColor[index],
-
                         textAlign = TextAlign.Center
                     )
                 }
@@ -701,7 +687,7 @@ fun ProfileDropdownMenu(
         modifier = Modifier
             //.fillMaxSize()
             .height(75.dp)
-            .width(350.dp)
+            .width(50.dp)
             .wrapContentSize(Alignment.TopStart)
     ) {
         IconButton(onClick = { expanded = true }, modifier = Modifier.fillMaxSize()) {
@@ -717,15 +703,6 @@ fun ProfileDropdownMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.background(MaterialTheme.colorScheme.onPrimary)
         ) {
-            /*DropdownMenuItem(
-                text = { Text("Edit Profile") },
-                onClick = { mainViewModel.openEditUser() },
-                leadingIcon = {
-                    Icon(
-                        Icons.Outlined.Edit,
-                        contentDescription = null
-                    )
-                })*/
             DropdownMenuItem(
                 text = { Text("Logout") },
                 onClick = {
@@ -801,157 +778,3 @@ fun LocationDropdownMenu() {
     }
 }
 
-
-@Composable
-fun EditUserPopup(mainViewModel: MainViewModel) {
-    val state = mainViewModel.mainViewState.collectAsState()
-
-    var name by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var city by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var street by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-    var email by rememberSaveable(stateSaver = TextFieldValue.Saver) {
-        mutableStateOf(TextFieldValue(""))
-    }
-
-    val focusManager = LocalFocusManager.current
-
-    if (state.value.openEditUser)
-        AlertDialog(
-            modifier = Modifier.clickable { focusManager.clearFocus() },
-            containerColor = MaterialTheme.colorScheme.secondary,
-            onDismissRequest = { mainViewModel.dismissEditUser() },
-            confirmButton = {},
-            text = {
-                Column(
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        // Name TextField
-                        OutlinedTextField(
-                            value = name,
-                            onValueChange = { newText -> name = newText },
-                            label = { androidx.compose.material.Text("Name") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = null
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            colors = getOutlinedTextFieldColors()
-                        )
-
-                        // City TextField
-                        OutlinedTextField(
-                            value = city,
-                            onValueChange = { newText -> city = newText },
-                            label = { androidx.compose.material.Text("City") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Place,
-                                    contentDescription = null
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            colors = getOutlinedTextFieldColors()
-                        )
-
-                        // Street TextField
-                        OutlinedTextField(
-                            value = street,
-                            onValueChange = { newText -> street = newText },
-                            label = { androidx.compose.material.Text("Street") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Home,
-                                    contentDescription = null
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            colors = getOutlinedTextFieldColors()
-                        )
-
-                        // Email TextField
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { newText -> email = newText },
-                            label = { androidx.compose.material.Text("Email") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.Email,
-                                    contentDescription = null
-                                )
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 8.dp),
-                            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                            colors = getOutlinedTextFieldColors()
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 25.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Button(
-                                onClick = { mainViewModel.dismissEditUser() },
-                                modifier = Modifier
-                                    .width(125.dp)
-                                    .height(60.dp)
-                                    .padding(top = 5.dp)
-                                    .shadow(
-                                        5.dp,
-                                        shape = RoundedCornerShape(20.dp),
-                                        ambientColor = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                    .clip(RoundedCornerShape(20.dp)),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                                shape = RectangleShape,
-                            ) {
-                                androidx.compose.material.Text(
-                                    "Cancel",
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontSize = 20.sp
-                                )
-                            }
-
-                            Button(
-                                onClick = { mainViewModel.dismissEditUser() },
-                                modifier = Modifier
-                                    .width(125.dp)
-                                    .height(60.dp)
-                                    .padding(top = 5.dp)
-                                    .shadow(
-                                        5.dp,
-                                        shape = RoundedCornerShape(20.dp),
-                                        ambientColor = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                    .clip(RoundedCornerShape(20.dp)),
-                                shape = RectangleShape
-                            ) {
-                                androidx.compose.material.Text(
-                                    text = "Save",
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    fontSize = 20.sp
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        )
-}

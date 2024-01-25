@@ -2,6 +2,7 @@ package com.example.fridgepals.ui.theme
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -14,7 +15,7 @@ val Typography = Typography(
     titleLarge = TextStyle(
         fontFamily = FontFamily(Font(R.font.cherry_bomb)),
         fontWeight = FontWeight.Normal,
-        fontSize = 42.sp,
+        fontSize = 38.sp,
         lineHeight = 48.sp,
         letterSpacing = 0.sp,
         color = colors.NotQuiteWhite
