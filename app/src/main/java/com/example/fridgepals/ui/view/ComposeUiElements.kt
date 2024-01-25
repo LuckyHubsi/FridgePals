@@ -445,143 +445,143 @@ fun PopUp(
 
     var selectedCategory by remember { mutableStateOf("") }
 
-    if (state.value.openDialog)
-        AlertDialog(
-            containerColor = MaterialTheme.colorScheme.secondary,
-            onDismissRequest = { mainViewModel.dismissDialog() },
-            confirmButton = {},
-            text = {
-                Column(
+    if (!state.value.openDialog) return
+    AlertDialog(
+        containerColor = MaterialTheme.colorScheme.secondary,
+        onDismissRequest = { mainViewModel.dismissDialog() },
+        confirmButton = {},
+        text = {
+            Column(
+            ) {
+                // Name
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { newText -> name = newText },
+                    label = { androidx.compose.material.Text("Name") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Quantity
+                OutlinedTextField(
+                    value = quantity,
+                    onValueChange = { newText -> quantity = newText },
+                    label = { androidx.compose.material.Text("Quantity") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                CategoryDropdownMenu(
+                    mainViewModel.mainViewState.value.listOfCategories,
+                    selectedCategory,
+                    onCategorySelected = { category ->
+                        selectedCategory = category
+                    })
+
+                // Pickup Date
+                OutlinedTextField(
+                    value = pickup_date,
+                    onValueChange = { newText -> pickup_date = newText },
+                    label = { androidx.compose.material.Text("Pick-up date") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+                    colors = getOutlinedTextFieldColors()
+                )
+
+                // Pickup Time
+                OutlinedTextField(
+                    value = pickup_time,
+                    onValueChange = { newText -> pickup_time = newText },
+                    label = { androidx.compose.material.Text("Pick-up time") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Face,
+                            contentDescription = null
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    colors = getOutlinedTextFieldColors()
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 25.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    // Name
-                    OutlinedTextField(
-                        value = name,
-                        onValueChange = { newText -> name = newText },
-                        label = { androidx.compose.material.Text("Name") },
+                    Button(
+                        onClick = { mainViewModel.dismissDialog() },
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    // Quantity
-                    OutlinedTextField(
-                        value = quantity,
-                        onValueChange = { newText -> quantity = newText },
-                        label = { androidx.compose.material.Text("Quantity") },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    CategoryDropdownMenu(
-                        mainViewModel.mainViewState.value.listOfCategories,
-                        selectedCategory,
-                        onCategorySelected = { category ->
-                            selectedCategory = category
-                        })
-
-                    // Pickup Date
-                    OutlinedTextField(
-                        value = pickup_date,
-                        onValueChange = { newText -> pickup_date = newText },
-                        label = { androidx.compose.material.Text("Pick-up date") },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = null
+                            .width(125.dp)
+                            .height(60.dp)
+                            .padding(top = 5.dp)
+                            .shadow(
+                                5.dp,
+                                shape = RoundedCornerShape(20.dp),
+                                ambientColor = MaterialTheme.colorScheme.onSecondary
                             )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                        colors = getOutlinedTextFieldColors()
-                    )
-
-                    // Pickup Time
-                    OutlinedTextField(
-                        value = pickup_time,
-                        onValueChange = { newText -> pickup_time = newText },
-                        label = { androidx.compose.material.Text("Pick-up time") },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Face,
-                                contentDescription = null
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 8.dp),
-                        colors = getOutlinedTextFieldColors()
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 25.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .clip(RoundedCornerShape(20.dp)),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
+                        shape = RectangleShape,
                     ) {
-                        Button(
-                            onClick = { mainViewModel.dismissDialog() },
-                            modifier = Modifier
-                                .width(125.dp)
-                                .height(60.dp)
-                                .padding(top = 5.dp)
-                                .shadow(
-                                    5.dp,
-                                    shape = RoundedCornerShape(20.dp),
-                                    ambientColor = MaterialTheme.colorScheme.onSecondary
-                                )
-                                .clip(RoundedCornerShape(20.dp)),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.tertiary),
-                            shape = RectangleShape,
-                        ) {
-                            androidx.compose.material.Text(
-                                "Cancel",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
-                            )
-                        }
+                        androidx.compose.material.Text(
+                            "Cancel",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 20.sp
+                        )
+                    }
 
-                        Button(
-                            modifier = Modifier
-                                .width(125.dp)
-                                .height(60.dp)
-                                .padding(top = 5.dp)
-                                .shadow(
-                                    5.dp,
-                                    shape = RoundedCornerShape(20.dp),
-                                    ambientColor = MaterialTheme.colorScheme.onSecondary
-                                )
-                                .clip(RoundedCornerShape(20.dp)),
-                            shape = RectangleShape,
-                            onClick = {
-                                mainViewModel.dismissDialog()
-                                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
-                                val fridgeItem = FridgeItem(
-                                    name = name,
-                                    quantity = quantity,
-                                    category = selectedCategory,
-                                    pickupDay = pickup_date,
-                                    pickupTime = pickup_time
-                                )
-                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
-                                    mainViewModel.addItemToFridge(userId, fridgeItem)
-                                }
-                            },
-                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
-                        ) {
-                            androidx.compose.material.Text(
-                                text = "Confirm",
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
+                    Button(
+                        modifier = Modifier
+                            .width(125.dp)
+                            .height(60.dp)
+                            .padding(top = 5.dp)
+                            .shadow(
+                                5.dp,
+                                shape = RoundedCornerShape(20.dp),
+                                ambientColor = MaterialTheme.colorScheme.onSecondary
                             )
-                        }
+                            .clip(RoundedCornerShape(20.dp)),
+                        shape = RectangleShape,
+                        onClick = {
+                            mainViewModel.dismissDialog()
+                            mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                            val fridgeItem = FridgeItem(
+                                name = name,
+                                quantity = quantity,
+                                category = selectedCategory,
+                                pickupDay = pickup_date,
+                                pickupTime = pickup_time
+                            )
+                            if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
+                                mainViewModel.addItemToFridge(userId, fridgeItem)
+                            }
+                        },
+                        enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
+                    ) {
+                        androidx.compose.material.Text(
+                            text = "Confirm",
+                            color = MaterialTheme.colorScheme.onPrimary,
+                            fontSize = 20.sp
+                        )
                     }
                 }
             }
-        )
+        }
+    )
 }
 
 @Composable
