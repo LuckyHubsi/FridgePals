@@ -73,7 +73,7 @@ fun MainView(
 
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController, state.value.selectedScreen) }
+        bottomBar = { BottomNavigationBar(navController, state.value.selectedScreen, mainViewModel, userId) }
     ) {
         NavHost(
             navController = navController,
@@ -163,7 +163,7 @@ fun MainView(
 }
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen) {
+fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen, mainViewModel: MainViewModel, userId: String) {
     val itemCount = 3 // Number of items in the BottomNavigationBar
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val itemWidth = (screenWidthDp / itemCount).dp
@@ -176,21 +176,31 @@ fun BottomNavigationBar(navController: NavHostController, selectedScreen: Screen
     ) {
         BottomNavItem(
             selected = (selectedScreen == Screen.First),
-            onClick = { navController.navigate(Screen.First.route) },
+            onClick = {
+                navController.navigate(Screen.First.route)
+                mainViewModel.refreshOwnFridgeItemsNotReserved(userId)
+                mainViewModel.refreshOwnFridgeItemsReserved(userId)
+                      },
             icon = R.drawable.icon_fridge,
             modifier = Modifier.width(itemWidth)
         )
 
         BottomNavItem(
             selected = (selectedScreen == Screen.Second),
-            onClick = { navController.navigate(Screen.Second.route) },
+            onClick = {
+                navController.navigate(Screen.Second.route)
+                mainViewModel.refreshCommunityItems(userId)
+                      },
             icon = R.drawable.icon_search,
             modifier = Modifier.width(itemWidth)
         )
 
         BottomNavItem(
             selected = (selectedScreen == Screen.Third),
-            onClick = { navController.navigate(Screen.Third.route) },
+            onClick = {
+                navController.navigate(Screen.Third.route)
+                mainViewModel.refreshReservedItems(userId)
+                      },
             icon = R.drawable.icon_basket,
             modifier = Modifier.width(itemWidth)
         )
