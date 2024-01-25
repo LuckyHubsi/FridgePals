@@ -1,10 +1,13 @@
 package com.example.fridgepals.ui.view_model
 
 import androidx.compose.ui.graphics.Color
+import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.theme.colors
 import com.example.fridgepals.ui.view.Screen
+
+typealias FridgeItemWithAddress = Pair<FridgeItem, Address>
 
 data class MainViewState(
     val selectedScreen: Screen = Screen.Login,
@@ -15,7 +18,10 @@ data class MainViewState(
     val userId: String? = null,
     var currentItemToEdit: FridgeItem? = null,
 
-    val communityFridgeItems: List<FridgeItem> = listOf(),
+    /**
+     * Each pair contains the fridge-item plus the address of its owner
+     */
+    val communityFridgeItems: List<FridgeItemWithAddress> = listOf(),
     val ownFridgeItemsNotReserved: List<FridgeItem> = listOf(),
     val ownFridgeItemsReserved: List<FridgeItem> = listOf(),
     val reservedItems: List<FridgeItem> = listOf(),

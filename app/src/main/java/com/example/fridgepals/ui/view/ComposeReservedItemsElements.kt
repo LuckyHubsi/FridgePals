@@ -24,6 +24,7 @@ import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.view_model.MainViewModel
 import androidx.compose.foundation.lazy.items
+import com.example.fridgepals.data.model.Address
 
 @SuppressLint("StateFlowValueCalledInComposition")
 @Composable
@@ -61,7 +62,9 @@ fun ReservedItems(mainViewModel: MainViewModel, onCancel: (String) -> Unit) {
                     .padding(start = 10.dp, end = 10.dp),
                 buttonContent = { ButtonContentReservedItems(index, it, onCancel) },
                     category = index.category,
-                    item = index
+                    item = index,
+                    // TODO: Get from db
+                    address = Address("wow city", "yay street")
             ) }
         }
     }

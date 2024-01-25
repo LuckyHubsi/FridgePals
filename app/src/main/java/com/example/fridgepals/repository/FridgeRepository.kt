@@ -1,8 +1,11 @@
 package com.example.fridgepals.repository
 
 import com.example.fridgepals.data.FirebaseManager
+import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
+import com.example.fridgepals.data.model.User
+import com.example.fridgepals.ui.view_model.FridgeItemWithAddress
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -10,29 +13,23 @@ import com.google.firebase.database.getValue
 
 object FridgeRepository {
     fun addItemToFridge(
-        userId: String,
-        fridgeItem: FridgeItem,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, fridgeItem: FridgeItem, onSuccess: () -> Unit, onFailure: (String) -> Unit
     ) {
         // Reference to the user's fridge in the database
         val itemRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge").push()
         // copy of fridgeItem with the itemId and ownerId (for reservations needed)
         val fridgeItemWithItemAndUserId = fridgeItem.copy(
-            itemId = itemRef.key ?: return onFailure("Failed to generate item ID"),
-            ownerId = userId
+            itemId = itemRef.key ?: return onFailure("Failed to generate item ID"), ownerId = userId
         )
 
 
         // Set the value of the new item in the user's fridge
-        itemRef.setValue(fridgeItemWithItemAndUserId)
-            .addOnSuccessListener {
-                onSuccess()
-            }
-            .addOnFailureListener { e ->
-                onFailure(e.message ?: "Failed to add item to fridge")
-            }
+        itemRef.setValue(fridgeItemWithItemAndUserId).addOnSuccessListener {
+            onSuccess()
+        }.addOnFailureListener { e ->
+            onFailure(e.message ?: "Failed to add item to fridge")
+        }
     }
 
     fun getFoodCategories(onSuccess: (List<String>) -> Unit, onFailure: (String) -> Unit) {
@@ -51,9 +48,7 @@ object FridgeRepository {
     }
 
     fun getFridgeItemsNotReserved(
-        userId: String,
-        onSuccess: (List<FridgeItem>) -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit
     ) {
         val fridgeRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge")
@@ -74,9 +69,7 @@ object FridgeRepository {
     }
 
     fun getFridgeItemsReserved(
-        userId: String,
-        onSuccess: (List<FridgeItem>) -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit
     ) {
         val fridgeRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge")
@@ -106,53 +99,98 @@ object FridgeRepository {
         val itemRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge")
                 .child(itemId)
-        itemRef.setValue(updateItem)
-            .addOnSuccessListener { onSuccess() }
+        itemRef.setValue(updateItem).addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to update item") }
     }
 
     fun deleteFridgeItem(
-        userId: String,
-        itemId: String,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, itemId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit
     ) {
         val itemRef =
             FirebaseManager.database.reference.child("users").child(userId).child("fridge")
                 .child(itemId)
-        itemRef.removeValue()
-            .addOnSuccessListener { onSuccess() }
+        itemRef.removeValue().addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to delete item") }
     }
 
     fun getCommunityFridge(
         currentUserId: String,
-        onSuccess: (List<FridgeItem>) -> Unit,
+        onSuccess: (List<FridgeItemWithAddress>) -> Unit,
         onFailure: (String) -> Unit
     ) {
         val usersRef = FirebaseManager.database.reference.child("users")
-        val communityFridgeItems = mutableListOf<FridgeItem>()
 
         usersRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                snapshot.children.forEach { userSnapshot ->
+            override fun onDataChange(usersSnapshot: DataSnapshot) {
+                val communityFridgeItems = mutableListOf<FridgeItemWithAddress>()
+
+                usersSnapshot.children.forEach { userSnapshot ->
 
                     // Check if the current userSnapshot is not the signed-in user
-                    if (userSnapshot.key != currentUserId) {
+                    val isNotCurrentUser = userSnapshot.key != currentUserId
+                    if (isNotCurrentUser) {
                         userSnapshot.child("fridge").children.forEach { itemSnapshot ->
                             val item = itemSnapshot.getValue(FridgeItem::class.java)
+                                ?: throw Exception("Could not parse fridge")
+
                             // Check if the item is not reserved before adding it
-                            if (item != null && !item.reserved) {
-                                communityFridgeItems.add(item)
+                            if (!item.reserved) {
+                                getAddressForUser(
+                                    item.ownerId, onSuccess = { address ->
+                                        communityFridgeItems.add(item to address)
+                                    }, onFailure
+                                )
                             }
                         }
                     }
                 }
+
+                // TODO: Wait for all address callbacks to return before we call onSuccess
+                // TODO: Actually just refactor all of this to use coroutines
                 onSuccess(communityFridgeItems)
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 onFailure(databaseError.message)
+            }
+        })
+    }
+
+    /**
+     * Gets the address of a user using their id.
+     * @param ownerId The id.
+     * @param onSuccess Callback that returns the resolved address.
+     * @param onFailure Callback that returns an error message if something went wrong.
+     */
+    private fun getAddressForUser(
+        ownerId: String, onSuccess: (Address) -> Unit, onFailure: (String) -> Unit
+    ) {
+        val addressRef =
+            FirebaseManager.database.reference.child("users").child(ownerId).child("address")
+        addressRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(addressSnapshot: DataSnapshot) {
+                val address = addressSnapshot.getValue(Address::class.java)!!
+                onSuccess(address)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onFailure(error.message)
+            }
+        })
+    }
+
+    private fun getUserById(
+        id: String, onSuccess: (User) -> Unit, onFailure: (String) -> Unit
+    ) {
+        val userRef = FirebaseManager.database.reference.child("users").child(id)
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(userSnapshot: DataSnapshot) {
+                val user = userSnapshot.getValue(User::class.java)!!
+                onSuccess(user)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                onFailure(error.message)
             }
         })
     }
@@ -177,8 +215,7 @@ object FridgeRepository {
         }
 
         val reservation = Reservations(reservationId, offeringUserId, itemId)
-        reservationRef.setValue(reservation)
-            .addOnSuccessListener { onSuccess() }
+        reservationRef.setValue(reservation).addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onFailure(e.message ?: "Failed to reserve item") }
 
         // Mark the item as reserved in the offering user's fridge
@@ -190,9 +227,7 @@ object FridgeRepository {
     }
 
     fun getReservedItems(
-        userId: String,
-        onSuccess: (List<FridgeItem>) -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, onSuccess: (List<FridgeItem>) -> Unit, onFailure: (String) -> Unit
     ) {
         val reservationsRef =
             FirebaseManager.database.reference.child("users").child(userId).child("reservations")
@@ -250,10 +285,10 @@ object FridgeRepository {
     }
 
     fun getReservations(
-        userId: String,
-        onSuccess: (List<Reservations>) -> Unit,
-        onFailure: (String) -> Unit) {
-        val reservationsRef = FirebaseManager.database.reference.child("users").child(userId).child("reservations")
+        userId: String, onSuccess: (List<Reservations>) -> Unit, onFailure: (String) -> Unit
+    ) {
+        val reservationsRef =
+            FirebaseManager.database.reference.child("users").child(userId).child("reservations")
         val reservationsList = mutableListOf<Reservations>()
 
         reservationsRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -277,10 +312,7 @@ object FridgeRepository {
     }
 
     fun deleteReservation(
-        userId: String,
-        reservationId: String,
-        onSuccess: () -> Unit,
-        onFailure: (String) -> Unit
+        userId: String, reservationId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit
     ) {
         // Reference to the user's reservation
         val reservationRef =
@@ -293,25 +325,22 @@ object FridgeRepository {
                 val reservation = snapshot.getValue(Reservations::class.java)
                 if (reservation != null) {
                     // Remove the reservation
-                    reservationRef.removeValue()
-                        .addOnSuccessListener {
-                            // Update the reserved status of the item
-                            val itemRef = FirebaseManager.database.reference.child("users")
-                                .child(reservation.offeringUserId).child("fridge")
-                                .child(reservation.itemId)
-                            itemRef.updateChildren(mapOf("reserved" to false))
-                                .addOnSuccessListener { onSuccess() }
-                                .addOnFailureListener { e ->
-                                    onFailure(
-                                        e.message ?: "Failed to update item status"
-                                    )
-                                }
-                        }
-                        .addOnFailureListener { e ->
-                            onFailure(
-                                e.message ?: "Failed to delete reservation"
-                            )
-                        }
+                    reservationRef.removeValue().addOnSuccessListener {
+                        // Update the reserved status of the item
+                        val itemRef = FirebaseManager.database.reference.child("users")
+                            .child(reservation.offeringUserId).child("fridge")
+                            .child(reservation.itemId)
+                        itemRef.updateChildren(mapOf("reserved" to false))
+                            .addOnSuccessListener { onSuccess() }.addOnFailureListener { e ->
+                                onFailure(
+                                    e.message ?: "Failed to update item status"
+                                )
+                            }
+                    }.addOnFailureListener { e ->
+                        onFailure(
+                            e.message ?: "Failed to delete reservation"
+                        )
+                    }
                 } else {
                     onFailure("Reservation not found")
                 }

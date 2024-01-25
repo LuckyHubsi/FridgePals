@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.ui.view_model.MainViewModel
 
@@ -76,18 +77,20 @@ fun CommunityFridge(mainViewModel: MainViewModel, onReserve: (String, String) ->
         modifier = Modifier
             .padding(top = 250.dp)
     ) {
-        items(mainViewModel.mainViewState.value.communityFridgeItems) { index ->
+        items(mainViewModel.mainViewState.value.communityFridgeItems) { pair ->
+            val (fridgeItem, address) = pair
             // Check if the item's category matches any selected filter
             if (mainViewModel.selectedFilters.isEmpty() ||
-                mainViewModel.selectedFilters.contains(index.category)
+                mainViewModel.selectedFilters.contains(fridgeItem.category)
             ) {
                 RoundedCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 10.dp, end = 10.dp),
-                    buttonContent = { ButtonContentCommunityFridge(index, onReserve) },
-                    category = index.category,
-                    item = index
+                    buttonContent = { ButtonContentCommunityFridge(fridgeItem, onReserve) },
+                    category = fridgeItem.category,
+                    item = fridgeItem,
+                    address = address
                 )
             }
         }

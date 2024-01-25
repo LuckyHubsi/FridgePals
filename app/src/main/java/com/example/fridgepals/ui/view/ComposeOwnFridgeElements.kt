@@ -150,7 +150,8 @@ fun OwnFridge(
                         )
                     },
                     category = index.category,
-                    item = index
+                    item = index,
+                    address = null
                 )
 
             }
@@ -195,7 +196,8 @@ fun OwnFridge(
                         )
                     },
                     category = index.category,
-                    item = index
+                    item = index,
+                    address = null
                 )
             }
         }

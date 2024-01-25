@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.fridgepals.R
+import com.example.fridgepals.data.model.Address
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations
 import com.example.fridgepals.ui.view_model.MainViewModel
@@ -96,7 +97,8 @@ fun RoundedCard(
     onRemoveClick: () -> Unit = {},
     buttonContent: @Composable () -> Unit,
     category: String,
-    item: FridgeItem
+    item: FridgeItem,
+    address: Address?
 ) {
     Box(
         modifier = modifier
@@ -141,12 +143,13 @@ fun RoundedCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                androidx.compose.material3.Text(
-                    "${item.category}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if(address != null)
+                    androidx.compose.material3.Text(
+                        "${address.city}, ${address.street}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                 androidx.compose.material3.Text(
                     "${item.pickupDay}, ${item.pickupTime}",
                     style = MaterialTheme.typography.bodyMedium,
