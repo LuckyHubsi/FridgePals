@@ -261,6 +261,8 @@ fun PopUp_Edit(
     item: FridgeItem,
 ) {
     val state = mainViewModel.mainViewState.collectAsState()
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
 
     var name by remember {
         mutableStateOf((item.name))
@@ -271,9 +273,6 @@ fun PopUp_Edit(
 
     var selectedCategory by remember { mutableStateOf(item.category) }
 
-    var pickup_date by remember {
-        mutableStateOf((item.pickupDay))
-    }
     var pickup_time by remember {
         mutableStateOf((item.pickupTime))
     }
@@ -314,22 +313,24 @@ fun PopUp_Edit(
                     })
 
                     // Pickup Date
-                    OutlinedTextField(
-                        value = pickup_date,
-                        onValueChange = { newText -> pickup_date = newText },
-                        label = { androidx.compose.material.Text("Pick-up date") },
-                        trailingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.DateRange,
-                                contentDescription = null
-                            )
-                        },
+                    Button(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(bottom = 8.dp),
-                        keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
-                        colors = getOutlinedTextFieldColors()
-                    )
+                        onClick = {
+                            val datePickerDialog = DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    mainViewModel.setPickupDay("$dayOfMonth.${month + 1}.$year")
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                            )
+                            datePickerDialog.show()
+                        }) {
+                        Text(if (state.value.pickupDay.isNotEmpty()) state.value.pickupDay else "Select Pickup Day")
+                    }
 
                     // Pickup Time
                     OutlinedTextField(
@@ -395,14 +396,14 @@ fun PopUp_Edit(
                                     name = name,
                                     quantity = quantity,
                                     category = selectedCategory,
-                                    pickupDay = pickup_date,
+                                    pickupDay = state.value.pickupDay,
                                     pickupTime = pickup_time
                                 )
-                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
+                                if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && state.value.pickupDay.isNotEmpty() && pickup_time.isNotEmpty()) {
                                     mainViewModel.editFridgeItem(userId, item.itemId, updatedItem)
                                 }
                             },
-                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()
+                            enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && state.value.pickupDay.isNotEmpty() && pickup_time.isNotEmpty()
                         ) {
                             androidx.compose.material.Text(
                                 text = "Confirm",
@@ -436,9 +437,6 @@ fun PopUp(
         mutableStateOf((""))
     }
 
-    var newPickUpDay by remember {
-        mutableStateOf((""))
-    }
     var pickup_time by remember {
         mutableStateOf((""))
     }
