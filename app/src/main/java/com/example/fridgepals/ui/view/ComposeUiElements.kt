@@ -256,7 +256,6 @@ fun PopUp_Edit(
     mainViewModel: MainViewModel,
     userId: String,
     item: FridgeItem,
-    onConfirm: (FridgeItem) -> Unit
 ) {
     val state = mainViewModel.mainViewState.collectAsState()
 
@@ -397,7 +396,7 @@ fun PopUp_Edit(
                                     pickupTime = pickup_time
                                 )
                                 if (name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()) {
-                                    onConfirm(updatedItem)
+                                    mainViewModel.editFridgeItem(userId, item.itemId, updatedItem)
                                 }
                             },
                             enabled = name.isNotEmpty() && quantity.isNotEmpty() && selectedCategory.isNotEmpty() && pickup_date.isNotEmpty() && pickup_time.isNotEmpty()

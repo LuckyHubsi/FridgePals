@@ -108,5 +108,21 @@ class MainViewModel() : ViewModel() {
             onFailure = {  }
         )
     }
+
+
+    // Function to edit a fridge item
+    fun editFridgeItem(userId: String, itemId: String, updatedItem: FridgeItem) {
+        FridgeRepository.editFridgeItem(userId, itemId, updatedItem,
+            onSuccess = {
+                // Handle the success case, e.g., by refreshing the list of items
+                refreshOwnFridgeItemsReserved(userId)
+                refreshOwnFridgeItemsNotReserved(userId)
+            },
+            onFailure = {
+                // Handle the failure case
+            }
+        )
+    }
+
 }
 

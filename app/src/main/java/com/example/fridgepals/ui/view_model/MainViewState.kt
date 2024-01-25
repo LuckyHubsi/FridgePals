@@ -1,5 +1,6 @@
 package com.example.fridgepals.ui.view_model
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.Color
 import com.example.fridgepals.data.model.FridgeItem
 import com.example.fridgepals.data.model.Reservations

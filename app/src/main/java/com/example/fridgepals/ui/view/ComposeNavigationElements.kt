@@ -104,7 +104,7 @@ fun MainView(
                     },
                     onEditItem = {
                         item -> mainViewModel.mainViewState.value.currentItemToEdit = item
-                    }
+                    },
                 )
             }
             composable(Screen.Second.route) {

@@ -45,7 +45,7 @@ fun OwnFridge(
     navController: NavController,
     userId: String,
     onDeleteItem: (FridgeItem) -> Unit,
-    onEditItem: (FridgeItem) -> Unit
+    onEditItem: (FridgeItem) -> Unit,
 ) {
     var username by remember { mutableStateOf("Loading...") }
 
@@ -137,6 +137,11 @@ fun OwnFridge(
                     buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
+                PopUp_Edit(
+                    mainViewModel,
+                    userId,
+                    index,
+                )
             }
 
             item {
@@ -171,6 +176,11 @@ fun OwnFridge(
                     buttonContent = { ButtonContentOwnFridge(mainViewModel,onDelete = onDeleteItem, index, onEdit = onEditItem) },
                     item = index
                 )
+                PopUp_Edit(
+                    mainViewModel,
+                    userId,
+                    index,
+                )
             }
         }
     }
@@ -178,34 +188,6 @@ fun OwnFridge(
         PopUp(
             mainViewModel,
             userId
-        )
-    }
-    Column() {
-        PopUp_Edit(
-            mainViewModel,
-            userId,
-            item = mainViewModel.mainViewState.value.currentItemToEdit!!,
-            onConfirm = {
-                    updatedItem ->
-                FridgeRepository.editFridgeItem(userId,
-                    mainViewModel.mainViewState.value.currentItemToEdit!!.itemId,
-                    updatedItem,
-                    onSuccess = {
-                        FridgeRepository.getFridgeItemsNotReserved(
-                            userId,
-                            onSuccess = { items ->
-                                fridgeItems = items
-                            },
-                            onFailure = {  })
-                        mainViewModel.mainViewState.value.currentItemToEdit = null
-                    },
-                    onFailure = { error ->
-                        // Handle error
-                        mainViewModel.mainViewState.value.currentItemToEdit = null
-                    }
-                )
-            }
-
         )
     }
     Column() {
