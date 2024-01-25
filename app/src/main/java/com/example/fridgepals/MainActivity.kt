@@ -16,6 +16,8 @@ import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Register
 import com.example.fridgepals.ui.view.Screen
 import com.example.fridgepals.ui.view_model.MainViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 
 class MainActivity : ComponentActivity() {
     private val mainViewModel = MainViewModel()
@@ -24,6 +26,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val loggedInUser = Firebase.auth.currentUser
+        if (loggedInUser != null) {
+            mainViewModel.setLoggedInUserId(loggedInUser.uid)
+        }
 
         setContent {
             val mainViewState by mainViewModel.mainViewState.collectAsState()
