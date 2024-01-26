@@ -50,17 +50,17 @@ fun CommunityFridge(mainViewModel: MainViewModel, onReserve: (String, String) ->
             verticalArrangement = Arrangement.Top
         ){
                 Row(
-                    modifier = Modifier.width(450.dp).height(40.dp),
+                    modifier = Modifier.width(450.dp).height(120.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ){
-                    Text("Change your location:", style = MaterialTheme.typography.titleMedium)
+                    Text("Filter by category:", style = MaterialTheme.typography.titleMedium)
                 }
-                Row(
+/*                Row(
                     modifier = Modifier
                 ){
                     LocationDropdownMenu()
-                }
+                }*/
         }
     }
 
