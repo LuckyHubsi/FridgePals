@@ -9,12 +9,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.fridgepals.repository.UserRepository
 import com.example.fridgepals.ui.theme.FridgePalsTheme
 import com.example.fridgepals.ui.view.Login
 import com.example.fridgepals.ui.view.MainView
 import com.example.fridgepals.ui.view.Register
 import com.example.fridgepals.ui.view.Screen
+import com.example.fridgepals.ui.view.showToast
 import com.example.fridgepals.ui.view_model.MainViewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
@@ -35,6 +37,9 @@ class MainActivity : ComponentActivity() {
             val mainViewState by mainViewModel.mainViewState.collectAsState()
             val userId = mainViewState.userId
 
+            val context = LocalContext.current
+
+
             FridgePalsTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -51,6 +56,7 @@ class MainActivity : ComponentActivity() {
                                             mainViewModel.setLoggedInUserId(loggedInUserId)
                                         },
                                         onFailure = {
+                                            showToast(context, "Wrong email or password.")
                                         }
                                     )
                                 })
