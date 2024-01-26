@@ -409,7 +409,7 @@ fun PopUp_Edit(
                             androidx.compose.material.Text(
                                 "Cancel",
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
+                                fontSize = 16.sp
                             )
                         }
 
@@ -445,7 +445,7 @@ fun PopUp_Edit(
                             androidx.compose.material.Text(
                                 text = "Confirm",
                                 color = MaterialTheme.colorScheme.onPrimary,
-                                fontSize = 20.sp
+                                fontSize = 16.sp
                             )
                         }
                     }
@@ -579,7 +579,7 @@ fun PopUp(
                         androidx.compose.material.Text(
                             "Cancel",
                             color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 20.sp
+                            fontSize = 16.sp
                         )
                     }
 
@@ -615,7 +615,7 @@ fun PopUp(
                         androidx.compose.material.Text(
                             text = "Confirm",
                             color = MaterialTheme.colorScheme.onPrimary,
-                            fontSize = 20.sp
+                            fontSize = 16.sp
                         )
                     }
                 }
